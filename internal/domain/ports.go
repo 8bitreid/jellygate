@@ -32,3 +32,8 @@ type Notifier interface {
 	InviteCreated(ctx context.Context, inv Invite) error
 	InviteUsed(ctx context.Context, inv Invite, username string) error
 }
+
+// RegistrationStore records Jellyfin accounts created via invites.
+type RegistrationStore interface {
+	Create(ctx context.Context, reg Registration) error
+}

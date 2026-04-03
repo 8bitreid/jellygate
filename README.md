@@ -70,7 +70,7 @@ migrations/             — embedded sql migration files
 | 2 | postgresql store | ✅ |
 | 3 | jellyfin api client | 🔄 |
 | 4 | auth & middleware | ⬜ |
-| 5 | admin handlers + ui | ⬜ |
+| 5 | admin handlers + ui | ✅ |
 | 6 | invite registration flow | ⬜ |
 | 7 | discord notifications | ⬜ |
 | 8 | dockerfile + compose + traefik | ⬜ |
