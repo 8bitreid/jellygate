@@ -55,7 +55,7 @@ func TestManager_CreateAndGet(t *testing.T) {
 	mgr := auth.NewManager(newStubStore(), false)
 	w := httptest.NewRecorder()
 
-	if err := mgr.Create(context.Background(), w, "admin"); err != nil {
+	if err := mgr.Create(context.Background(), w, "admin", "jf-tok"); err != nil {
 		t.Fatalf("Create: %v", err)
 	}
 
@@ -90,7 +90,7 @@ func TestManager_Delete(t *testing.T) {
 	mgr := auth.NewManager(store, false)
 
 	w := httptest.NewRecorder()
-	mgr.Create(context.Background(), w, "admin")
+	mgr.Create(context.Background(), w, "admin", "jf-tok")
 
 	resp := w.Result()
 	req := httptest.NewRequest(http.MethodPost, "/", nil)

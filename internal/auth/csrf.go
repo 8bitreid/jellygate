@@ -13,7 +13,7 @@ const (
 // SetCSRFCookie generates a CSRF token and writes it as a cookie.
 // The same token must be submitted in the form field on POST.
 func SetCSRFCookie(w http.ResponseWriter, secure bool) (string, error) {
-	token, err := generateToken()
+	token, err := GenerateToken()
 	if err != nil {
 		return "", err
 	}
