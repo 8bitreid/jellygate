@@ -25,11 +25,15 @@ func NewInviteStore(pool *pgxpool.Pool) *InviteStore {
 
 // Create persists a new invite.
 func (s *InviteStore) Create(ctx context.Context, inv domain.Invite) error {
+	libraryIDs := inv.LibraryIDs
+	if libraryIDs == nil {
+		libraryIDs = []string{}
+	}
 	_, err := s.pool.Exec(ctx, `
 		INSERT INTO invites (id, token, label, created_by, expires_at, max_uses, library_ids)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)`,
 		inv.ID, inv.Token, inv.Label, inv.CreatedBy,
-		inv.ExpiresAt, inv.MaxUses, inv.LibraryIDs,
+		inv.ExpiresAt, inv.MaxUses, libraryIDs,
 	)
 	if err != nil {
 		return fmt.Errorf("store.InviteStore.Create: %w", err)
