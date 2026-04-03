@@ -24,9 +24,9 @@ func NewSessionStore(pool *pgxpool.Pool) *SessionStore {
 // Create persists a new session.
 func (s *SessionStore) Create(ctx context.Context, sess domain.Session) error {
 	_, err := s.pool.Exec(ctx, `
-		INSERT INTO sessions (token, username, expires_at)
-		VALUES ($1, $2, $3)`,
-		sess.Token, sess.Username, sess.ExpiresAt,
+		INSERT INTO sessions (token, username, jellyfin_token, expires_at)
+		VALUES ($1, $2, $3, $4)`,
+		sess.Token, sess.Username, sess.JellyfinToken, sess.ExpiresAt,
 	)
 	if err != nil {
 		return fmt.Errorf("store.SessionStore.Create: %w", err)
@@ -40,8 +40,8 @@ func (s *SessionStore) Create(ctx context.Context, sess domain.Session) error {
 func (s *SessionStore) Get(ctx context.Context, token string) (domain.Session, error) {
 	var sess domain.Session
 	err := s.pool.QueryRow(ctx, `
-		SELECT token, username, expires_at FROM sessions WHERE token = $1`, token).
-		Scan(&sess.Token, &sess.Username, &sess.ExpiresAt)
+		SELECT token, username, jellyfin_token, expires_at FROM sessions WHERE token = $1`, token).
+		Scan(&sess.Token, &sess.Username, &sess.JellyfinToken, &sess.ExpiresAt)
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return domain.Session{}, domain.ErrSessionNotFound

@@ -1,0 +1,30 @@
+{{define "base"}}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{block "title" .}}jellygate{{end}}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  {{block "header" .}}
+  <header>
+    <span class="logo">jellygate</span>
+    {{if .Username}}
+    <nav>
+      <span>{{.Username}}</span>
+      <form method="POST" action="/admin/logout" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        <button class="btn btn-sm" style="background:transparent;color:var(--muted);border:1px solid var(--border)">sign out</button>
+      </form>
+    </nav>
+    {{end}}
+  </header>
+  {{end}}
+  <main class="page">
+    {{if .Flash}}<div class="flash flash-{{.FlashType}}">{{.Flash}}</div>{{end}}
+    {{block "content" .}}{{end}}
+  </main>
+</body>
+</html>
+{{end}}

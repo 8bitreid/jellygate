@@ -34,17 +34,18 @@ func NewManager(store domain.SessionStore, secure bool) *Manager {
 }
 
 // Create generates a new session for username, persists it, and writes
-// the session cookie to w.
-func (m *Manager) Create(ctx context.Context, w http.ResponseWriter, username string) error {
-	token, err := generateToken()
+// the session cookie to w. jellyfinToken is stored for subsequent API calls.
+func (m *Manager) Create(ctx context.Context, w http.ResponseWriter, username, jellyfinToken string) error {
+	token, err := GenerateToken()
 	if err != nil {
 		return fmt.Errorf("auth.Manager.Create: %w", err)
 	}
 
 	sess := domain.Session{
-		Token:     token,
-		Username:  username,
-		ExpiresAt: time.Now().Add(sessionTTL),
+		Token:         token,
+		Username:      username,
+		JellyfinToken: jellyfinToken,
+		ExpiresAt:     time.Now().Add(sessionTTL),
 	}
 	if err := m.store.Create(ctx, sess); err != nil {
 		return fmt.Errorf("auth.Manager.Create: %w", err)
@@ -105,8 +106,8 @@ func WithSessionCtx(ctx context.Context, s domain.Session) context.Context {
 	return context.WithValue(ctx, sessionKey, s)
 }
 
-// generateToken returns a cryptographically random 32-byte base64url token.
-func generateToken() (string, error) {
+// GenerateToken returns a cryptographically random 32-byte base64url token.
+func GenerateToken() (string, error) {
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
 		return "", fmt.Errorf("generateToken: %w", err)

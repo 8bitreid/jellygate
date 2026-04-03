@@ -1,0 +1,112 @@
+:root {
+  --bg:       #101010;
+  --surface:  #1a1a2e;
+  --border:   #2a2a4a;
+  --text:     #e0e0e0;
+  --muted:    #888;
+  --accent:   #00a4dc;
+  --danger:   #c0392b;
+  --success:  #27ae60;
+  --radius:   6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── layout ── */
+.page { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+header .logo { font-size: 1.2rem; font-weight: 700; color: var(--accent); letter-spacing: .03em; }
+header nav { display: flex; gap: 1rem; align-items: center; }
+header nav span { color: var(--muted); font-size: .9rem; }
+
+/* ── cards ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--accent); text-transform: uppercase; letter-spacing: .05em; }
+
+/* ── forms ── */
+.form-row { margin-bottom: 1rem; }
+label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: .3rem; }
+input[type=text], input[type=password], input[type=number], input[type=datetime-local] {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: .5rem .75rem;
+  font-size: .95rem;
+}
+input:focus { outline: none; border-color: var(--accent); }
+
+.checkboxes { display: flex; flex-wrap: wrap; gap: .5rem .75rem; }
+.checkboxes label { display: flex; align-items: center; gap: .35rem; color: var(--text); font-size: .9rem; }
+.checkboxes input[type=checkbox] { accent-color: var(--accent); }
+
+/* ── buttons ── */
+.btn {
+  display: inline-block;
+  padding: .45rem 1rem;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  font-size: .9rem;
+  font-weight: 500;
+  transition: opacity .15s;
+}
+.btn:hover { opacity: .85; text-decoration: none; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-danger  { background: var(--danger); color: #fff; }
+.btn-sm { padding: .3rem .7rem; font-size: .82rem; }
+
+/* ── table ── */
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th { text-align: left; color: var(--muted); font-weight: 500; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; padding: .5rem .75rem; border-bottom: 1px solid var(--border); }
+td { padding: .6rem .75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+.empty { color: var(--muted); text-align: center; padding: 2rem; }
+
+/* ── status badges ── */
+.badge { display: inline-block; padding: .2rem .55rem; border-radius: 99px; font-size: .78rem; font-weight: 600; }
+.badge-active   { background: #1a3a2a; color: var(--success); }
+.badge-revoked  { background: #3a1a1a; color: var(--danger); }
+.badge-expired  { background: #2a2a1a; color: #e0a000; }
+.badge-exhausted{ background: #2a1a3a; color: #a07adc; }
+
+/* ── flash messages ── */
+.flash { padding: .7rem 1rem; border-radius: var(--radius); margin-bottom: 1rem; font-size: .9rem; }
+.flash-error   { background: #3a1a1a; color: #e07070; border: 1px solid var(--danger); }
+.flash-success { background: #1a3a2a; color: #70e0a0; border: 1px solid var(--success); }
+
+/* ── login ── */
+.login-wrap { display: flex; align-items: center; justify-content: center; min-height: 80vh; }
+.login-box { width: 100%; max-width: 380px; }
+.login-box h1 { font-size: 1.6rem; font-weight: 700; color: var(--accent); margin-bottom: .25rem; }
+.login-box p  { color: var(--muted); font-size: .9rem; margin-bottom: 1.5rem; }
+
+/* ── invite URL ── */
+.invite-url { font-family: monospace; font-size: .82rem; color: var(--muted); word-break: break-all; }

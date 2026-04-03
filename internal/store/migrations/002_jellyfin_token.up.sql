@@ -1,0 +1,1 @@
+ALTER TABLE sessions ADD COLUMN jellyfin_token TEXT NOT NULL DEFAULT '';

@@ -1,0 +1,76 @@
+{{template "base" .}}
+
+{{define "title"}}dashboard — jellygate{{end}}
+
+{{define "content"}}
+<div class="card">
+  <h2>create invite</h2>
+  <form method="POST" action="/admin/invites">
+    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+    <div class="form-row">
+      <label for="label">label</label>
+      <input type="text" id="label" name="label" placeholder="e.g. friend's invite" required>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="form-row">
+        <label for="expires_at">expires (optional)</label>
+        <input type="datetime-local" id="expires_at" name="expires_at">
+      </div>
+      <div class="form-row">
+        <label for="max_uses">max uses (optional)</label>
+        <input type="number" id="max_uses" name="max_uses" min="1" placeholder="unlimited">
+      </div>
+    </div>
+    {{if .Libraries}}
+    <div class="form-row">
+      <label>library access</label>
+      <div class="checkboxes">
+        {{range .Libraries}}
+        <label><input type="checkbox" name="library_ids" value="{{.ID}}" checked> {{.Name}}</label>
+        {{end}}
+      </div>
+    </div>
+    {{end}}
+    <button type="submit" class="btn btn-primary">create invite</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>invites</h2>
+  {{if .Invites}}
+  <table>
+    <thead>
+      <tr>
+        <th>label</th>
+        <th>link</th>
+        <th>uses</th>
+        <th>expires</th>
+        <th>status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {{range .Invites}}
+    <tr>
+      <td>{{.Label}}</td>
+      <td><span class="invite-url">{{.URL}}</span></td>
+      <td>{{.UseCount}}{{if .MaxUses}} / {{.MaxUses}}{{else}} / ∞{{end}}</td>
+      <td>{{if .ExpiresAt}}{{.ExpiresAt.Format "2006-01-02 15:04"}}{{else}}never{{end}}</td>
+      <td><span class="badge badge-{{.StatusClass}}">{{.Status}}</span></td>
+      <td>
+        {{if .CanRevoke}}
+        <form method="POST" action="/admin/invites/{{.ID}}/revoke" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+          <button type="submit" class="btn btn-sm btn-danger">revoke</button>
+        </form>
+        {{end}}
+      </td>
+    </tr>
+    {{end}}
+    </tbody>
+  </table>
+  {{else}}
+  <p class="empty">no invites yet — create one above</p>
+  {{end}}
+</div>
+{{end}}

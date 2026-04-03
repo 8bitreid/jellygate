@@ -1,0 +1,29 @@
+{{template "base" .}}
+
+{{define "title"}}sign in — jellygate{{end}}
+
+{{define "header"}}<header><span class="logo">jellygate</span></header>{{end}}
+
+{{define "content"}}
+<div class="login-wrap">
+  <div class="login-box">
+    <h1>jellygate</h1>
+    <p>sign in with your jellyfin admin credentials</p>
+    {{if .Flash}}<div class="flash flash-{{.FlashType}}">{{.Flash}}</div>{{end}}
+    <div class="card">
+      <form method="POST" action="/admin/login">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        <div class="form-row">
+          <label for="username">username</label>
+          <input type="text" id="username" name="username" autocomplete="username" required>
+        </div>
+        <div class="form-row">
+          <label for="password">password</label>
+          <input type="password" id="password" name="password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:.5rem">sign in</button>
+      </form>
+    </div>
+  </div>
+</div>
+{{end}}
