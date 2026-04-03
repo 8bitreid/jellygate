@@ -1,0 +1,40 @@
+{{template "base" .}}
+
+{{define "title"}}join via invite — jellygate{{end}}
+
+{{define "header"}}<header><span class="logo">jellygate</span></header>{{end}}
+
+{{define "content"}}
+<div class="login-wrap">
+  <div class="login-box">
+    {{if eq .Status "form"}}
+    <h1>create account</h1>
+    {{if .Label}}<p class="muted">invited: <strong>{{.Label}}</strong></p>{{end}}
+    {{if .Error}}<div class="flash flash-error">{{.Error}}</div>{{end}}
+    <div class="card">
+      <form method="POST" action="/invite/{{.Token}}">
+        <div class="form-row">
+          <label for="username">username</label>
+          <input type="text" id="username" name="username" autocomplete="username" required>
+        </div>
+        <div class="form-row">
+          <label for="password">password</label>
+          <input type="password" id="password" name="password" autocomplete="new-password" required minlength="6">
+        </div>
+        <div class="form-row">
+          <label for="confirm">confirm password</label>
+          <input type="password" id="confirm" name="confirm" autocomplete="new-password" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:.5rem">create account</button>
+      </form>
+    </div>
+    {{else if eq .Status "success"}}
+    <h1>welcome!</h1>
+    <p>your account has been created. you can now sign in to jellyfin.</p>
+    {{else}}
+    <h1>invite unavailable</h1>
+    <p class="muted">{{.Message}}</p>
+    {{end}}
+  </div>
+</div>
+{{end}}
