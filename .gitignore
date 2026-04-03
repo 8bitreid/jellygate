@@ -1,0 +1,15 @@
+# build output
+jellygate
+/dist/
+
+# env files with secrets
+.env
+
+# Go toolchain
+*.test
+*.out
+
+# editor
+.idea/
+.vscode/
+*.swp
