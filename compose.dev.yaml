@@ -1,9 +1,8 @@
 services:
   jellygate:
     build: .
-    container_name: jellygate
-    restart: unless-stopped
-    env_file: [.env]
+    container_name: jellygate-dev
+    env_file: [.env.dev]
     network_mode: host
     depends_on:
       db:
@@ -11,15 +10,15 @@ services:
 
   db:
     image: postgres:16-alpine
-    restart: unless-stopped
+    container_name: jellygate-db-dev
     environment:
       POSTGRES_DB: jellygate
       POSTGRES_USER: jellygate
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: devpass
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata_dev:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U jellygate"]
       interval: 5s
@@ -27,4 +26,4 @@ services:
       retries: 5
 
 volumes:
-  pgdata:
+  pgdata_dev:
