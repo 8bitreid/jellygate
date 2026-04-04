@@ -80,7 +80,7 @@ func main() {
 	// Static assets embedded in the binary.
 	staticFS, err := fs.Sub(web.FS, "static")
 	if err != nil {
-		slog.Error("static assets init", "err", err)
+		slog.Error("static assets init", "error", err)
 		os.Exit(1)
 	}
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServerFS(staticFS)))
