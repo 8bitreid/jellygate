@@ -46,7 +46,8 @@ func (j *stubJellyfinClientErr) SetLibraryAccess(_ context.Context, _, _ string,
 func newInviteHandler(t *testing.T, is domain.InviteStore, jf domain.JellyfinClient) (*handler.InviteHandler, *stubRegistrationStore) {
 	t.Helper()
 	rs := &stubRegistrationStore{}
-	h, err := handler.NewInviteHandler(is, rs, jf, &notifications.NoopNotifier{}, "admin-tok")
+	cfg := &stubSettingsStore{token: "admin-tok"}
+	h, err := handler.NewInviteHandler(is, rs, jf, &notifications.NoopNotifier{}, cfg)
 	if err != nil {
 		t.Fatalf("NewInviteHandler: %v", err)
 	}

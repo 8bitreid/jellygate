@@ -37,3 +37,9 @@ type Notifier interface {
 type RegistrationStore interface {
 	Create(ctx context.Context, reg Registration) error
 }
+
+// SettingsStore persists application-level configuration.
+type SettingsStore interface {
+	GetJellyfinAdminToken(ctx context.Context) (string, error)
+	SetJellyfinAdminToken(ctx context.Context, token string) error
+}

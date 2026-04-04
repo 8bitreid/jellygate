@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strings"
@@ -155,6 +156,11 @@ func (c *Client) do(req *http.Request, wantStatus int, dst any) error {
 
 	if resp.StatusCode != wantStatus {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
+		slog.Error("jellyfin request failed",
+			"method", req.Method,
+			"url", req.URL.String(),
+			"status", resp.StatusCode,
+		)
 		return fmt.Errorf("unexpected status %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
 	}
 	if dst != nil {

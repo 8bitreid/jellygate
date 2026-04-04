@@ -9,4 +9,5 @@ var (
 	ErrInviteExhausted = errors.New("invite has reached its maximum uses")
 	ErrSessionNotFound = errors.New("session not found")
 	ErrSessionExpired  = errors.New("session has expired")
+	ErrSettingNotFound = errors.New("setting not found")
 )

@@ -1,0 +1,35 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Environment and secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Development files
+compose.dev.yaml
+compose.yaml
+*.md
+README.md
+
+# Build artifacts
+bin/
+dist/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+*_test.go
+testdata/
+
+# OS files
+.DS_Store
+Thumbs.db

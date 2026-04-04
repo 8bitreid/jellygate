@@ -8,7 +8,11 @@
 <div class="login-wrap">
   <div class="login-box">
     <h1>jellygate</h1>
+    {{if .IsSetup}}
+    <p>welcome! sign in with your jellyfin admin account to finish setup.</p>
+    {{else}}
     <p>sign in with your jellyfin admin credentials</p>
+    {{end}}
     {{if .Flash}}<div class="flash flash-{{.FlashType}}">{{.Flash}}</div>{{end}}
     <div class="card">
       <form method="POST" action="/admin/login">
