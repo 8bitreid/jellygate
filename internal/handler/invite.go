@@ -134,6 +134,7 @@ func (h *InviteHandler) HandleInviteSubmit(w http.ResponseWriter, r *http.Reques
 
 	// Increment invite use count (best-effort).
 	_ = h.invites.IncrementUse(r.Context(), inv.ID)
+	inv.UseCount++ // reflect the increment so the notification shows the correct count
 
 	// Notify (best-effort).
 	_ = h.notifier.InviteUsed(r.Context(), inv, username)
