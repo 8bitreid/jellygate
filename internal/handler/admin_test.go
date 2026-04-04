@@ -19,6 +19,19 @@ import (
 
 // --- stubs ---
 
+type stubSettingsStore struct{ token string }
+
+func (s *stubSettingsStore) GetJellyfinAdminToken(_ context.Context) (string, error) {
+	if s.token == "" {
+		return "", domain.ErrSettingNotFound
+	}
+	return s.token, nil
+}
+func (s *stubSettingsStore) SetJellyfinAdminToken(_ context.Context, token string) error {
+	s.token = token
+	return nil
+}
+
 type stubInviteStore struct {
 	invites map[string]domain.Invite
 }
@@ -108,7 +121,8 @@ func newAdmin(t *testing.T, jf domain.JellyfinClient) (*handler.Admin, *stubSess
 	ss := newSessionStore()
 	is := newInviteStore()
 	mgr := auth.NewManager(ss, false)
-	adm, err := handler.NewAdmin(mgr, is, jf, "http://localhost:8080", false)
+	cfg := &stubSettingsStore{token: "stored-jf-tok"}
+	adm, err := handler.NewAdmin(mgr, is, jf, cfg, "http://localhost:8080", false)
 	if err != nil {
 		t.Fatalf("NewAdmin: %v", err)
 	}

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -19,6 +20,7 @@ type Admin struct {
 	sessions      *auth.Manager
 	invites       domain.InviteStore
 	jellyfin      domain.JellyfinClient
+	settings      domain.SettingsStore
 	baseURL       string
 	secure        bool
 	loginTmpl     *template.Template
@@ -31,6 +33,7 @@ func NewAdmin(
 	sessions *auth.Manager,
 	invites domain.InviteStore,
 	jellyfin domain.JellyfinClient,
+	settings domain.SettingsStore,
 	baseURL string,
 	secure bool,
 ) (*Admin, error) {
@@ -46,6 +49,7 @@ func NewAdmin(
 		sessions:      sessions,
 		invites:       invites,
 		jellyfin:      jellyfin,
+		settings:      settings,
 		baseURL:       baseURL,
 		secure:        secure,
 		loginTmpl:     loginTmpl,
@@ -59,6 +63,7 @@ type loginData struct {
 	CSRFToken string
 	Flash     string
 	FlashType string
+	IsSetup   bool // true on first-ever login — shows setup messaging
 }
 
 type inviteView struct {
@@ -87,7 +92,12 @@ func (a *Admin) HandleLoginForm(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
-	data := loginData{CSRFToken: csrfToken}
+
+	// Detect first-run: no admin token stored yet.
+	_, settingsErr := a.settings.GetJellyfinAdminToken(r.Context())
+	isSetup := errors.Is(settingsErr, domain.ErrSettingNotFound)
+
+	data := loginData{CSRFToken: csrfToken, IsSetup: isSetup}
 	if msg := r.URL.Query().Get("error"); msg != "" {
 		data.Flash = msg
 		data.FlashType = "error"
@@ -112,6 +122,13 @@ func (a *Admin) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	jfToken, err := a.jellyfin.Authenticate(r.Context(), username, password)
 	if err != nil {
 		http.Redirect(w, r, "/admin/login?error=invalid+credentials", http.StatusSeeOther)
+		return
+	}
+
+	// Persist the admin token so the invite handler can create users without
+	// requiring a live admin session.
+	if err := a.settings.SetJellyfinAdminToken(r.Context(), jfToken); err != nil {
+		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
 

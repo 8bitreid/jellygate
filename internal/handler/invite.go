@@ -19,18 +19,19 @@ type InviteHandler struct {
 	registrations domain.RegistrationStore
 	jellyfin      domain.JellyfinClient
 	notifier      domain.Notifier
-	adminToken    string // Jellyfin admin access token for user management
+	settings      domain.SettingsStore
 	tmpl          *template.Template
 }
 
 // NewInviteHandler constructs an InviteHandler.
-// adminToken is a Jellyfin admin access token used to create users and set library access.
+// The Jellyfin admin token is fetched from settings at request time, so the
+// handler works correctly even if the token changes after a re-login.
 func NewInviteHandler(
 	invites domain.InviteStore,
 	registrations domain.RegistrationStore,
 	jellyfin domain.JellyfinClient,
 	notifier domain.Notifier,
-	adminToken string,
+	settings domain.SettingsStore,
 ) (*InviteHandler, error) {
 	tmpl, err := template.ParseFS(web.FS, "templates/base.html", "templates/invite.html")
 	if err != nil {
@@ -41,7 +42,7 @@ func NewInviteHandler(
 		registrations: registrations,
 		jellyfin:      jellyfin,
 		notifier:      notifier,
-		adminToken:    adminToken,
+		settings:      settings,
 		tmpl:          tmpl,
 	}, nil
 }
@@ -109,8 +110,18 @@ func (h *InviteHandler) HandleInviteSubmit(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	// Fetch the Jellyfin admin token stored at last admin login.
+	adminToken, err := h.settings.GetJellyfinAdminToken(r.Context())
+	if err != nil {
+		h.render(w, invitePageData{
+			Status:  "error",
+			Message: "jellygate is not configured yet — ask your admin to sign in first",
+		})
+		return
+	}
+
 	// Create the Jellyfin user.
-	jellyfinUID, err := h.jellyfin.CreateUser(r.Context(), h.adminToken, username, password)
+	jellyfinUID, err := h.jellyfin.CreateUser(r.Context(), adminToken, username, password)
 	if err != nil {
 		h.render(w, invitePageData{
 			Status: "form", Token: token, Label: inv.Label,
@@ -120,7 +131,7 @@ func (h *InviteHandler) HandleInviteSubmit(w http.ResponseWriter, r *http.Reques
 	}
 
 	// Apply library access policy (best-effort; user is already created).
-	_ = h.jellyfin.SetLibraryAccess(r.Context(), h.adminToken, jellyfinUID, inv.LibraryIDs)
+	_ = h.jellyfin.SetLibraryAccess(r.Context(), adminToken, jellyfinUID, inv.LibraryIDs)
 
 	// Record the registration (best-effort).
 	reg := domain.Registration{
