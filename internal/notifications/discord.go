@@ -10,11 +10,7 @@ import (
 	"github.com/rmewborne/jellygate/internal/domain"
 )
 
-const (
-	colorBlue  = "42204"  // #00A4DC — Jellyfin accent
-	colorGreen = "5023588" // #4CAF64 — success
-	botName    = "jellygate"
-)
+const botName = "jellygate"
 
 // DiscordNotifier sends invite lifecycle events to a Discord webhook.
 type DiscordNotifier struct {
@@ -41,7 +37,6 @@ func (n *DiscordNotifier) InviteCreated(_ context.Context, inv domain.Invite) er
 		Username: strPtr(botName),
 		Embeds: &[]discordwebhook.Embed{{
 			Title:  strPtr("invite created"),
-			Color:  strPtr(colorBlue),
 			Fields: &fields,
 		}},
 	}
@@ -63,7 +58,6 @@ func (n *DiscordNotifier) InviteUsed(_ context.Context, inv domain.Invite, usern
 		Username: strPtr(botName),
 		Embeds: &[]discordwebhook.Embed{{
 			Title:  strPtr("new registration"),
-			Color:  strPtr(colorGreen),
 			Fields: &fields,
 		}},
 	}
@@ -81,7 +75,7 @@ func fmtExpiry(t *time.Time) string {
 	if t == nil {
 		return "never"
 	}
-	return t.Format("2006-01-02 15:04")
+	return t.UTC().Format("2006-01-02 15:04 UTC")
 }
 
 func fmtMaxUses(n *int) string {

@@ -16,18 +16,61 @@ import (
 func fakeWebhook(t *testing.T, statusCode int, fn func(body map[string]any)) *httptest.Server {
 	t.Helper()
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
 		if r.Method != http.MethodPost {
 			t.Errorf("want POST, got %s", r.Method)
+			return
 		}
 		var payload map[string]any
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 			t.Errorf("decode payload: %v", err)
+			return
 		}
 		if fn != nil {
 			fn(payload)
 		}
 		w.WriteHeader(statusCode)
 	}))
+}
+
+func extractEmbedFields(t *testing.T, got map[string]any) (embed map[string]any, fields []any) {
+	t.Helper()
+	embedsRaw, ok := got["embeds"]
+	if !ok {
+		t.Fatal("expected payload to contain embeds")
+	}
+	embeds, ok := embedsRaw.([]any)
+	if !ok {
+		t.Fatalf("expected embeds to be []any, got %T", embedsRaw)
+	}
+	if len(embeds) == 0 {
+		t.Fatal("expected at least one embed")
+	}
+	embed, ok = embeds[0].(map[string]any)
+	if !ok {
+		t.Fatalf("expected first embed to be map[string]any, got %T", embeds[0])
+	}
+	fieldsRaw, ok := embed["fields"]
+	if !ok {
+		t.Fatal("expected embed to contain fields")
+	}
+	fields, ok = fieldsRaw.([]any)
+	if !ok {
+		t.Fatalf("expected embed fields to be []any, got %T", fieldsRaw)
+	}
+	return embed, fields
+}
+
+func fieldValues(fields []any) []string {
+	var vals []string
+	for _, f := range fields {
+		if m, ok := f.(map[string]any); ok {
+			if v, ok := m["value"].(string); ok {
+				vals = append(vals, v)
+			}
+		}
+	}
+	return vals
 }
 
 func TestDiscordNotifier_InviteCreated(t *testing.T) {
@@ -50,21 +93,15 @@ func TestDiscordNotifier_InviteCreated(t *testing.T) {
 	if got["username"] != "jellygate" {
 		t.Errorf("want username jellygate, got %v", got["username"])
 	}
-	embeds := got["embeds"].([]any)
-	if len(embeds) == 0 {
-		t.Fatal("expected at least one embed")
-	}
-	embed := embeds[0].(map[string]any)
+
+	embed, fields := extractEmbedFields(t, got)
 	if embed["title"] != "invite created" {
 		t.Errorf("want title 'invite created', got %v", embed["title"])
 	}
 
-	// Verify invite label appears in a field value.
-	fields := embed["fields"].([]any)
 	var foundLabel bool
-	for _, f := range fields {
-		field := f.(map[string]any)
-		if v, ok := field["value"].(string); ok && strings.Contains(v, "friends") {
+	for _, v := range fieldValues(fields) {
+		if strings.Contains(v, "friends") {
 			foundLabel = true
 		}
 	}
@@ -87,14 +124,11 @@ func TestDiscordNotifier_InviteCreated_WithExpiry(t *testing.T) {
 		t.Fatalf("InviteCreated: %v", err)
 	}
 
-	embeds := got["embeds"].([]any)
-	embed := embeds[0].(map[string]any)
-	fields := embed["fields"].([]any)
+	_, fields := extractEmbedFields(t, got)
+	vals := fieldValues(fields)
 
 	var foundExpiry, foundMax bool
-	for _, f := range fields {
-		field := f.(map[string]any)
-		v, _ := field["value"].(string)
+	for _, v := range vals {
 		if strings.Contains(v, "2026-12-31") {
 			foundExpiry = true
 		}
@@ -122,17 +156,14 @@ func TestDiscordNotifier_InviteUsed(t *testing.T) {
 		t.Fatalf("InviteUsed: %v", err)
 	}
 
-	embeds := got["embeds"].([]any)
-	embed := embeds[0].(map[string]any)
+	embed, fields := extractEmbedFields(t, got)
 	if embed["title"] != "new registration" {
 		t.Errorf("want title 'new registration', got %v", embed["title"])
 	}
 
-	fields := embed["fields"].([]any)
 	var foundUser bool
-	for _, f := range fields {
-		field := f.(map[string]any)
-		if v, ok := field["value"].(string); ok && v == "alice" {
+	for _, v := range fieldValues(fields) {
+		if v == "alice" {
 			foundUser = true
 		}
 	}
@@ -148,7 +179,7 @@ func TestDiscordNotifier_WebhookError(t *testing.T) {
 	n := notifications.NewDiscordNotifier(srv.URL)
 	err := n.InviteCreated(context.Background(), domain.Invite{Label: "x", CreatedBy: "admin"})
 	if err == nil {
-		t.Error("expected error on non-2xx response")
+		t.Fatal("expected error on non-2xx response")
 	}
 	if !strings.Contains(err.Error(), "InviteCreated") {
 		t.Errorf("expected wrapped error, got: %v", err)
