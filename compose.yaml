@@ -4,11 +4,7 @@ services:
     container_name: jellygate
     restart: unless-stopped
     env_file: [.env]
-    ports:
-      - "127.0.0.1:8080:8080"
-      - "100.77.129.78:8080:8080"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    network_mode: host
     depends_on:
       db:
         condition: service_healthy
@@ -20,6 +16,8 @@ services:
       POSTGRES_DB: jellygate
       POSTGRES_USER: jellygate
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
