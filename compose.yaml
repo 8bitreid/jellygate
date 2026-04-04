@@ -3,7 +3,7 @@ services:
     build: .
     container_name: jellygate
     restart: unless-stopped
-    env_file: [.env]
+    env_file: [.env.dev]
     network_mode: host
     depends_on:
       db:
@@ -15,7 +15,7 @@ services:
     environment:
       POSTGRES_DB: jellygate
       POSTGRES_USER: jellygate
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: devpass
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
