@@ -6,6 +6,7 @@ services:
     env_file: [.env]
     ports:
       - "127.0.0.1:8080:8080"
+      - "100.77.129.78:8080:8080"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:

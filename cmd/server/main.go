@@ -52,6 +52,7 @@ func main() {
 
 	// --- jellyfin client ---
 	jf := jellyfin.New(jfURL)
+	slog.Info("jellyfin configured", "url", jfURL)
 
 	// --- notifier ---
 	notifier := buildNotifier(discordURL)

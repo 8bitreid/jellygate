@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
@@ -121,6 +122,7 @@ func (a *Admin) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	jfToken, err := a.jellyfin.Authenticate(r.Context(), username, password)
 	if err != nil {
+		slog.Error("jellyfin login failed", "user", username, "err", err)
 		http.Redirect(w, r, "/admin/login?error=invalid+credentials", http.StatusSeeOther)
 		return
 	}
