@@ -145,30 +145,57 @@ func TestDiscordNotifier_InviteCreated_WithExpiry(t *testing.T) {
 }
 
 func TestDiscordNotifier_InviteUsed(t *testing.T) {
-	var got map[string]any
-	srv := fakeWebhook(t, http.StatusNoContent, func(body map[string]any) { got = body })
-	defer srv.Close()
-
-	n := notifications.NewDiscordNotifier(srv.URL)
-	inv := domain.Invite{Label: "friends", UseCount: 1}
-
-	if err := n.InviteUsed(context.Background(), inv, "alice"); err != nil {
-		t.Fatalf("InviteUsed: %v", err)
+	maxUses := 5
+	tests := []struct {
+		name      string
+		inv       domain.Invite
+		wantUses  string
+	}{
+		{
+			name:     "unlimited",
+			inv:      domain.Invite{Label: "friends", UseCount: 1},
+			wantUses: "1 / ∞",
+		},
+		{
+			name:     "limited",
+			inv:      domain.Invite{Label: "vip", UseCount: 3, MaxUses: &maxUses},
+			wantUses: "3 / 5",
+		},
 	}
 
-	embed, fields := extractEmbedFields(t, got)
-	if embed["title"] != "new registration" {
-		t.Errorf("want title 'new registration', got %v", embed["title"])
-	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got map[string]any
+			srv := fakeWebhook(t, http.StatusNoContent, func(body map[string]any) { got = body })
+			defer srv.Close()
 
-	var foundUser bool
-	for _, v := range fieldValues(fields) {
-		if v == "alice" {
-			foundUser = true
-		}
-	}
-	if !foundUser {
-		t.Error("expected username 'alice' in embed fields")
+			n := notifications.NewDiscordNotifier(srv.URL)
+			if err := n.InviteUsed(context.Background(), tt.inv, "alice"); err != nil {
+				t.Fatalf("InviteUsed: %v", err)
+			}
+
+			embed, fields := extractEmbedFields(t, got)
+			if embed["title"] != "new registration" {
+				t.Errorf("want title 'new registration', got %v", embed["title"])
+			}
+
+			vals := fieldValues(fields)
+			var foundUser, foundUses bool
+			for _, v := range vals {
+				if v == "alice" {
+					foundUser = true
+				}
+				if v == tt.wantUses {
+					foundUses = true
+				}
+			}
+			if !foundUser {
+				t.Error("expected username 'alice' in embed fields")
+			}
+			if !foundUses {
+				t.Errorf("expected uses %q in embed fields, got %v", tt.wantUses, vals)
+			}
+		})
 	}
 }
 

@@ -13,6 +13,13 @@ import (
 const botName = "jellygate"
 
 // DiscordNotifier sends invite lifecycle events to a Discord webhook.
+//
+// Embed color is intentionally omitted: the Discord API requires color as a
+// decimal integer but gtuk/discordwebhook models it as *string, which
+// JSON-encodes as a quoted string and is silently ignored by Discord.
+//
+// Wiring: cmd/server/main.go selects DiscordNotifier when DISCORD_WEBHOOK_URL
+// is set, and falls back to notifications.NoopNotifier when it is not.
 type DiscordNotifier struct {
 	webhookURL string
 }
