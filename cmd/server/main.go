@@ -28,7 +28,7 @@ func main() {
 	baseURL     := mustEnv("BASE_URL")
 	discordURL  := os.Getenv("DISCORD_WEBHOOK_URL")
 	secure      := os.Getenv("SECURE_COOKIES") != "false"
-	behindProxy := os.Getenv("BEHIND_PROXY") != "false"
+	behindProxy := os.Getenv("BEHIND_PROXY") == "true"
 
 	// --- database ---
 	pool, err := store.Open(ctx, dbURL)
@@ -78,7 +78,11 @@ func main() {
 	mux := http.NewServeMux()
 
 	// Static assets embedded in the binary.
-	staticFS, _ := fs.Sub(web.FS, "static")
+	staticFS, err := fs.Sub(web.FS, "static")
+	if err != nil {
+		slog.Error("static assets init", "err", err)
+		os.Exit(1)
+	}
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServerFS(staticFS)))
 
 	// Health — no auth, no rate limit; used by reverse proxy.

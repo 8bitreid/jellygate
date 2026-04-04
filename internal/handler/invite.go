@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -112,11 +113,16 @@ func (h *InviteHandler) HandleInviteSubmit(w http.ResponseWriter, r *http.Reques
 
 	// Fetch the Jellyfin admin token stored at last admin login.
 	adminToken, err := h.settings.GetJellyfinAdminToken(r.Context())
-	if err != nil {
+	if errors.Is(err, domain.ErrSettingNotFound) {
 		h.render(w, invitePageData{
 			Status:  "error",
 			Message: "jellygate is not configured yet — ask your admin to sign in first",
 		})
+		return
+	}
+	if err != nil {
+		slog.Error("handler.InviteHandler.HandleInviteSubmit: get jellyfin admin token", "error", err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 

@@ -160,7 +160,6 @@ func (c *Client) do(req *http.Request, wantStatus int, dst any) error {
 			"method", req.Method,
 			"url", req.URL.String(),
 			"status", resp.StatusCode,
-			"body", strings.TrimSpace(string(body)),
 		)
 		return fmt.Errorf("unexpected status %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
 	}

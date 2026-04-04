@@ -96,6 +96,11 @@ func (a *Admin) HandleLoginForm(w http.ResponseWriter, r *http.Request) {
 
 	// Detect first-run: no admin token stored yet.
 	_, settingsErr := a.settings.GetJellyfinAdminToken(r.Context())
+	if settingsErr != nil && !errors.Is(settingsErr, domain.ErrSettingNotFound) {
+		slog.Error("handler.Admin.HandleLoginForm: get jellyfin admin token", "error", settingsErr)
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
 	isSetup := errors.Is(settingsErr, domain.ErrSettingNotFound)
 
 	data := loginData{CSRFToken: csrfToken, IsSetup: isSetup}
