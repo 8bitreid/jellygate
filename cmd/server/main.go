@@ -27,6 +27,8 @@ func main() {
 	jfURL       := mustEnv("JELLYFIN_URL")
 	baseURL     := mustEnv("BASE_URL")
 	discordURL  := os.Getenv("DISCORD_WEBHOOK_URL")
+	mediaURL    := mustEnv("MEDIA_URL")
+	seerrURL    := os.Getenv("SEERR_URL")
 	secure      := os.Getenv("SECURE_COOKIES") != "false"
 	behindProxy := os.Getenv("BEHIND_PROXY") == "true"
 
@@ -53,6 +55,7 @@ func main() {
 	// --- jellyfin client ---
 	jf := jellyfin.New(jfURL)
 	slog.Info("jellyfin configured", "url", jfURL)
+	slog.Info("base url configured", "baseURL", baseURL)
 
 	// --- notifier ---
 	notifier := buildNotifier(discordURL)
@@ -71,6 +74,12 @@ func main() {
 	)
 	if err != nil {
 		slog.Error("invite handler init", "err", err)
+		os.Exit(1)
+	}
+
+	tutorialHandler, err := handler.NewTutorialHandler(mediaURL, seerrURL)
+	if err != nil {
+		slog.Error("tutorial handler init", "err", err)
 		os.Exit(1)
 	}
 
@@ -118,6 +127,11 @@ func main() {
 		rateLimit(http.HandlerFunc(inviteHandler.HandleInviteForm)))
 	mux.Handle("POST /invite/{token}",
 		rateLimit(http.HandlerFunc(inviteHandler.HandleInviteSubmit)))
+
+	// Tutorial/onboarding — no auth required (shown after registration).
+	mux.HandleFunc("GET /tutorial", tutorialHandler.HandleTutorial)
+	mux.HandleFunc("POST /tutorial/skip", tutorialHandler.HandleTutorialSkip)
+	mux.HandleFunc("POST /tutorial/complete", tutorialHandler.HandleTutorialComplete)
 
 	// Wrap everything in security headers.
 	srv := middleware.SecureHeaders(mux)

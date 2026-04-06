@@ -1,0 +1,105 @@
+{{template "base" .}}
+
+{{define "title"}}welcome — jellygate{{end}}
+
+{{define "head"}}
+  <link rel="stylesheet" href="/static/tutorial.css">
+  <script src="/static/tutorial.js" defer></script>
+{{end}}
+
+{{define "header"}}<header><span class="logo">jellygate</span></header>{{end}}
+
+{{define "content"}}
+<div class="tutorial-wrap">
+  <div class="tutorial-box">
+    <div class="tutorial-progress">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <span class="progress-text" id="progressText">1 of {{if .SeerrURL}}3{{else}}2{{end}}</span>
+    </div>
+
+    <div class="tutorial-content">
+      <!-- Step 1: Welcome -->
+      <div class="tutorial-step active" data-step="1">
+        <div class="step-icon">🎬</div>
+        <h1>welcome!</h1>
+        <p class="step-description">Your account has been created. Let's get you started with everything you need to know.</p>
+        <div class="card tutorial-card">
+          <h3>accessing the media server</h3>
+          <p>Visit <a href="{{.MediaURL}}" target="_blank"><strong>{{.MediaURL}}</strong></a> to access your media library.</p>
+          <p class="step-note">Log in with the username and password you just created.</p>
+        </div>
+      </div>
+
+      <!-- Step 2: Apps -->
+      <div class="tutorial-step" data-step="2">
+        <div class="step-icon">📱</div>
+        <h1>suggested apps</h1>
+        <p class="step-description">Get the best experience with these official Jellyfin apps:</p>
+        <div class="card tutorial-card">
+          <div class="app-list">
+            <div class="app-item">
+              <strong>📱 Mobile</strong>
+              <ul>
+                <li><strong>iOS:</strong> Jellyfin or Swiftfin from App Store</li>
+                <li><strong>Android:</strong> Jellyfin from Google Play</li>
+              </ul>
+            </div>
+            <div class="app-item">
+              <strong>📺 TV</strong>
+              <ul>
+                <li>Apple TV, Android TV, Fire TV, Roku</li>
+                <li>Search for "Jellyfin" in your TV's app store</li>
+              </ul>
+            </div>
+            <div class="app-item">
+              <strong>💻 Desktop</strong>
+              <ul>
+                <li>Use the web browser or download Jellyfin Media Player</li>
+                <li>Available for Windows, Mac, and Linux</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {{if .SeerrURL}}
+      <!-- Step 3: Request & Report -->
+      <div class="tutorial-step" data-step="3">
+        <div class="step-icon">🎯</div>
+        <h1>request & report</h1>
+        <p class="step-description">Need something? Found an issue? We've got you covered.</p>
+        <div class="card tutorial-card">
+          <h3>🎬 request media</h3>
+          <p>Visit <a href="{{.SeerrURL}}" target="_blank"><strong>{{.SeerrURL}}</strong></a> to request new movies and TV shows.</p>
+          <p class="step-note">Use the same username you created to sign in.</p>
+
+          <div class="divider"></div>
+
+          <h3>🐛 report problems</h3>
+          <p>Found an issue with playback, subtitles, or quality? Report it on Seerr too!</p>
+          <p class="step-note">Click the "🐛 Report Issue" button on any movie or show.</p>
+        </div>
+      </div>
+      {{end}}
+    </div>
+
+    <div class="tutorial-controls">
+      <form method="POST" action="/tutorial/skip" style="display:inline">
+        <button type="submit" class="btn btn-skip" id="skipBtn">skip tutorial</button>
+      </form>
+      <div class="tutorial-nav">
+        <button type="button" class="btn btn-secondary" id="prevBtn" disabled>← back</button>
+        <button type="button" class="btn btn-primary" id="nextBtn">next →</button>
+        <form method="POST" action="/tutorial/complete" style="display:inline">
+          <button type="submit" class="btn btn-primary" id="finishBtn" style="display:none">
+            go to jellyfin →
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{end}}
