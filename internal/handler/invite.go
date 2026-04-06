@@ -157,7 +157,7 @@ func (h *InviteHandler) HandleInviteSubmit(w http.ResponseWriter, r *http.Reques
 	_ = h.notifier.InviteUsed(r.Context(), inv, username)
 
 	// Redirect to tutorial/onboarding.
-	http.Redirect(w, r, "/tutorial", http.StatusFound)
+	http.Redirect(w, r, "/tutorial", http.StatusSeeOther)
 }
 
 // --- helpers ---

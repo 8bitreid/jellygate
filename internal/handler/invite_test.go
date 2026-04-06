@@ -178,8 +178,8 @@ func TestHandleInviteSubmit_Success(t *testing.T) {
 
 	h.HandleInviteSubmit(rec, req)
 
-	if rec.Code != http.StatusFound {
-		t.Errorf("want 302, got %d", rec.Code)
+	if rec.Code != http.StatusSeeOther {
+		t.Errorf("want 303, got %d", rec.Code)
 	}
 	if loc := rec.Header().Get("Location"); loc != "/tutorial" {
 		t.Errorf("expected redirect to /tutorial, got %q", loc)

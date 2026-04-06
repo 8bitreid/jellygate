@@ -130,8 +130,8 @@ func main() {
 
 	// Tutorial/onboarding — no auth required (shown after registration).
 	mux.HandleFunc("GET /tutorial", tutorialHandler.HandleTutorial)
-	mux.HandleFunc("POST /tutorial/skip", tutorialHandler.HandleTutorialSkip)
-	mux.HandleFunc("POST /tutorial/complete", tutorialHandler.HandleTutorialComplete)
+	mux.HandleFunc("GET /tutorial/skip", tutorialHandler.HandleTutorialSkip)
+	mux.HandleFunc("GET /tutorial/complete", tutorialHandler.HandleTutorialComplete)
 
 	// Wrap everything in security headers.
 	srv := middleware.SecureHeaders(mux)

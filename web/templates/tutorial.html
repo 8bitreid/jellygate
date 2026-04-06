@@ -27,7 +27,7 @@
         <p class="step-description">Your account has been created. Let's get you started with everything you need to know.</p>
         <div class="card tutorial-card">
           <h3>accessing the media server</h3>
-          <p>Visit <a href="{{.MediaURL}}" target="_blank"><strong>{{.MediaURL}}</strong></a> to access your media library.</p>
+          <p>Visit <a href="{{.MediaURL}}" target="_blank" rel="noopener noreferrer"><strong>{{.MediaURL}}</strong></a> to access your media library.</p>
           <p class="step-note">Log in with the username and password you just created.</p>
         </div>
       </div>
@@ -72,7 +72,7 @@
         <p class="step-description">Need something? Found an issue? We've got you covered.</p>
         <div class="card tutorial-card">
           <h3>🎬 request media</h3>
-          <p>Visit <a href="{{.SeerrURL}}" target="_blank"><strong>{{.SeerrURL}}</strong></a> to request new movies and TV shows.</p>
+          <p>Visit <a href="{{.SeerrURL}}" target="_blank" rel="noopener noreferrer"><strong>{{.SeerrURL}}</strong></a> to request new movies and TV shows.</p>
           <p class="step-note">Use the same username you created to sign in.</p>
 
           <div class="divider"></div>
@@ -86,17 +86,13 @@
     </div>
 
     <div class="tutorial-controls">
-      <form method="POST" action="/tutorial/skip" style="display:inline">
-        <button type="submit" class="btn btn-skip" id="skipBtn">skip tutorial</button>
-      </form>
+      <a href="/tutorial/skip" class="btn btn-skip" id="skipBtn">skip tutorial</a>
       <div class="tutorial-nav">
         <button type="button" class="btn btn-secondary" id="prevBtn" disabled>← back</button>
         <button type="button" class="btn btn-primary" id="nextBtn">next →</button>
-        <form method="POST" action="/tutorial/complete" style="display:inline">
-          <button type="submit" class="btn btn-primary" id="finishBtn" style="display:none">
-            go to jellyfin →
-          </button>
-        </form>
+        <a href="/tutorial/complete" class="btn btn-primary" id="finishBtn" style="display:none">
+          go to jellyfin →
+        </a>
       </div>
     </div>
   </div>
