@@ -113,6 +113,9 @@ func (j *stubJellyfinClient) CreateUser(_ context.Context, _, _, _ string) (stri
 func (j *stubJellyfinClient) SetLibraryAccess(_ context.Context, _, _ string, _ []string) error {
 	return nil
 }
+func (j *stubJellyfinClient) SetDisplayPreferences(_ context.Context, _, _ string, _ []string) error {
+	return nil
+}
 
 // --- helpers ---
 

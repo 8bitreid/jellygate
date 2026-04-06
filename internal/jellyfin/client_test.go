@@ -158,3 +158,48 @@ func TestSetLibraryAccess_EmptyListEnablesAll(t *testing.T) {
 		t.Errorf("want EnableAllFolders=true when no libraries specified")
 	}
 }
+
+func TestSetDisplayPreferences_SendsGroupedFolders(t *testing.T) {
+	var gotPrefs map[string]any
+	var gotQuery string
+	srv := fakeJellyfin(t, map[string]http.HandlerFunc{
+		"POST /DisplayPreferences/usersettings": func(w http.ResponseWriter, r *http.Request) {
+			json.NewDecoder(r.Body).Decode(&gotPrefs)
+			gotQuery = r.URL.RawQuery
+			w.WriteHeader(http.StatusNoContent)
+		},
+	})
+
+	client := jellyfin.New(srv.URL)
+	err := client.SetDisplayPreferences(context.Background(), "tok", "user-abc", []string{"lib-1", "lib-2"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	folders, _ := gotPrefs["GroupedFolders"].([]any)
+	if len(folders) != 2 {
+		t.Errorf("want 2 GroupedFolders, got %d", len(folders))
+	}
+	if gotPrefs["Id"] != "usersettings" {
+		t.Errorf("want Id=usersettings, got %q", gotPrefs["Id"])
+	}
+	if gotPrefs["UserId"] != "user-abc" {
+		t.Errorf("want UserId=user-abc, got %q", gotPrefs["UserId"])
+	}
+	if gotQuery == "" {
+		t.Error("expected query params (userId, client) on the request URL")
+	}
+}
+
+func TestSetDisplayPreferences_ErrorPropagated(t *testing.T) {
+	srv := fakeJellyfin(t, map[string]http.HandlerFunc{
+		"POST /DisplayPreferences/usersettings": func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "server error", http.StatusInternalServerError)
+		},
+	})
+
+	client := jellyfin.New(srv.URL)
+	err := client.SetDisplayPreferences(context.Background(), "tok", "user-abc", []string{"lib-1"})
+	if err == nil {
+		t.Fatal("expected error when Jellyfin returns non-204, got nil")
+	}
+}

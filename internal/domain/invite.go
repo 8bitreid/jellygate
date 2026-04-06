@@ -4,16 +4,17 @@ import "time"
 
 // Invite is a single-use or multi-use registration link.
 type Invite struct {
-	ID         string
-	Token      string
-	Label      string
-	CreatedBy  string
-	CreatedAt  time.Time
-	ExpiresAt  *time.Time // nil = never expires
-	MaxUses    *int       // nil = unlimited
-	UseCount   int
-	LibraryIDs []string
-	Revoked    bool
+	ID             string
+	Token          string
+	Label          string
+	CreatedBy      string
+	CreatedAt      time.Time
+	ExpiresAt      *time.Time // nil = never expires
+	MaxUses        *int       // nil = unlimited
+	UseCount       int
+	LibraryIDs     []string
+	GroupLibraries bool // group enabled libraries together on the user's home screen
+	Revoked        bool
 }
 
 // IsValid reports whether the invite can still be used.
