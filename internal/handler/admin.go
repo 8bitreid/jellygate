@@ -202,11 +202,12 @@ func (a *Admin) HandleCreateInvite(w http.ResponseWriter, r *http.Request) {
 
 	sess, _ := auth.FromContext(r.Context())
 	inv := domain.Invite{
-		ID:         uuid.NewString(),
-		Token:      mustGenerateToken(),
-		Label:      r.FormValue("label"),
-		CreatedBy:  sess.Username,
-		LibraryIDs: r.Form["library_ids"],
+		ID:             uuid.NewString(),
+		Token:          mustGenerateToken(),
+		Label:          r.FormValue("label"),
+		CreatedBy:      sess.Username,
+		LibraryIDs:     r.Form["library_ids"],
+		GroupLibraries: r.FormValue("group_libraries") == "1",
 	}
 
 	if raw := r.FormValue("expires_at"); raw != "" {

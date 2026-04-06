@@ -25,6 +25,7 @@ type JellyfinClient interface {
 	ListLibraries(ctx context.Context, adminToken string) ([]Library, error)
 	CreateUser(ctx context.Context, adminToken, username, password string) (userID string, err error)
 	SetLibraryAccess(ctx context.Context, adminToken, userID string, libraryIDs []string) error
+	SetDisplayPreferences(ctx context.Context, adminToken, userID string, libraryIDs []string) error
 }
 
 // Notifier delivers notifications about invite lifecycle events.

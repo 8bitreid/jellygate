@@ -40,6 +40,9 @@ func (j *stubJellyfinClientErr) CreateUser(_ context.Context, _, _, _ string) (s
 func (j *stubJellyfinClientErr) SetLibraryAccess(_ context.Context, _, _ string, _ []string) error {
 	return nil
 }
+func (j *stubJellyfinClientErr) SetDisplayPreferences(_ context.Context, _, _ string, _ []string) error {
+	return nil
+}
 
 // --- helpers ---
 
@@ -259,5 +262,84 @@ func TestHandleInviteSubmit_AlreadyExhausted(t *testing.T) {
 
 	if !strings.Contains(rec.Body.String(), "maximum") {
 		t.Error("expected exhausted error page")
+	}
+}
+
+// spyJellyfinClient records whether SetDisplayPreferences was called.
+type spyJellyfinClient struct {
+	displayPrefsCalledWith []string // libraryIDs passed to SetDisplayPreferences
+}
+
+func (j *spyJellyfinClient) Authenticate(_ context.Context, _, _ string) (string, error) {
+	return "tok", nil
+}
+func (j *spyJellyfinClient) ListLibraries(_ context.Context, _ string) ([]domain.Library, error) {
+	return nil, nil
+}
+func (j *spyJellyfinClient) CreateUser(_ context.Context, _, _, _ string) (string, error) {
+	return "new-user-id", nil
+}
+func (j *spyJellyfinClient) SetLibraryAccess(_ context.Context, _, _ string, _ []string) error {
+	return nil
+}
+func (j *spyJellyfinClient) SetDisplayPreferences(_ context.Context, _, _ string, libraryIDs []string) error {
+	j.displayPrefsCalledWith = libraryIDs
+	return nil
+}
+
+func TestHandleInviteSubmit_GroupLibraries_CallsDisplayPreferences(t *testing.T) {
+	is := newInviteStore()
+	id := uuid.NewString()
+	inv := activeInvite(id, "tok-grp")
+	inv.LibraryIDs = []string{"lib-movies", "lib-tv"}
+	inv.GroupLibraries = true
+	is.invites[id] = inv
+
+	spy := &spyJellyfinClient{}
+	h, _ := newInviteHandler(t, is, spy)
+
+	form := url.Values{"username": {"newuser"}, "password": {"secret1"}, "confirm": {"secret1"}}
+	req := httptest.NewRequest(http.MethodPost, "/invite/tok-grp", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetPathValue("token", "tok-grp")
+	rec := httptest.NewRecorder()
+
+	h.HandleInviteSubmit(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("want 200, got %d", rec.Code)
+	}
+	if spy.displayPrefsCalledWith == nil {
+		t.Error("expected SetDisplayPreferences to be called when GroupLibraries=true")
+	}
+	if len(spy.displayPrefsCalledWith) != 2 {
+		t.Errorf("want 2 library IDs passed to SetDisplayPreferences, got %d", len(spy.displayPrefsCalledWith))
+	}
+}
+
+func TestHandleInviteSubmit_NoGroupLibraries_SkipsDisplayPreferences(t *testing.T) {
+	is := newInviteStore()
+	id := uuid.NewString()
+	inv := activeInvite(id, "tok-nogrp")
+	inv.LibraryIDs = []string{"lib-movies"}
+	inv.GroupLibraries = false
+	is.invites[id] = inv
+
+	spy := &spyJellyfinClient{}
+	h, _ := newInviteHandler(t, is, spy)
+
+	form := url.Values{"username": {"newuser2"}, "password": {"secret1"}, "confirm": {"secret1"}}
+	req := httptest.NewRequest(http.MethodPost, "/invite/tok-nogrp", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetPathValue("token", "tok-nogrp")
+	rec := httptest.NewRecorder()
+
+	h.HandleInviteSubmit(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("want 200, got %d", rec.Code)
+	}
+	if spy.displayPrefsCalledWith != nil {
+		t.Error("expected SetDisplayPreferences NOT to be called when GroupLibraries=false")
 	}
 }

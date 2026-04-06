@@ -11,7 +11,7 @@ import (
 	"github.com/rmewborne/jellygate/internal/domain"
 )
 
-const inviteCols = `id, token, label, created_by, created_at, expires_at, max_uses, use_count, library_ids, revoked`
+const inviteCols = `id, token, label, created_by, created_at, expires_at, max_uses, use_count, library_ids, group_libraries, revoked`
 
 // InviteStore is a Postgres-backed implementation of domain.InviteStore.
 type InviteStore struct {
@@ -30,10 +30,10 @@ func (s *InviteStore) Create(ctx context.Context, inv domain.Invite) error {
 		libraryIDs = []string{}
 	}
 	_, err := s.pool.Exec(ctx, `
-		INSERT INTO invites (id, token, label, created_by, expires_at, max_uses, library_ids)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+		INSERT INTO invites (id, token, label, created_by, expires_at, max_uses, library_ids, group_libraries)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
 		inv.ID, inv.Token, inv.Label, inv.CreatedBy,
-		inv.ExpiresAt, inv.MaxUses, libraryIDs,
+		inv.ExpiresAt, inv.MaxUses, libraryIDs, inv.GroupLibraries,
 	)
 	if err != nil {
 		return fmt.Errorf("store.InviteStore.Create: %w", err)
@@ -112,6 +112,7 @@ func scanInvite(row pgx.CollectableRow) (domain.Invite, error) {
 		&inv.MaxUses,
 		&inv.UseCount,
 		&inv.LibraryIDs,
+		&inv.GroupLibraries,
 		&inv.Revoked,
 	)
 	return inv, err

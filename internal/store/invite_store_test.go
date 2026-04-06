@@ -145,3 +145,37 @@ func TestInviteStore_WithLibraryIDs(t *testing.T) {
 		t.Errorf("library_ids round-trip failed: got %v", got.LibraryIDs)
 	}
 }
+
+func TestInviteStore_GroupLibraries(t *testing.T) {
+	pool := newTestDB(t)
+	s := store.NewInviteStore(pool)
+	ctx := context.Background()
+
+	id := uuid.NewString()
+	_ = s.Create(ctx, domain.Invite{
+		ID: id, Token: "tok-grp", Label: "g", CreatedBy: "admin",
+		LibraryIDs:     []string{"lib-movies", "lib-tv"},
+		GroupLibraries: true,
+	})
+
+	got, err := s.GetByToken(ctx, "tok-grp")
+	if err != nil {
+		t.Fatalf("GetByToken: %v", err)
+	}
+	if !got.GroupLibraries {
+		t.Error("want GroupLibraries=true, got false")
+	}
+
+	// Verify the default is false when not set.
+	id2 := uuid.NewString()
+	_ = s.Create(ctx, domain.Invite{
+		ID: id2, Token: "tok-nogrp", Label: "ng", CreatedBy: "admin",
+	})
+	got2, err := s.GetByToken(ctx, "tok-nogrp")
+	if err != nil {
+		t.Fatalf("GetByToken: %v", err)
+	}
+	if got2.GroupLibraries {
+		t.Error("want GroupLibraries=false by default, got true")
+	}
+}

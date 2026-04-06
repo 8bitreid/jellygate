@@ -134,6 +134,33 @@ func (c *Client) SetLibraryAccess(ctx context.Context, adminToken, userID string
 	return nil
 }
 
+// SetDisplayPreferences configures home-screen library grouping for a user.
+// Passing the user's enabled libraryIDs causes Jellyfin to group those
+// libraries together into a single collection on the home screen.
+func (c *Client) SetDisplayPreferences(ctx context.Context, adminToken, userID string, libraryIDs []string) error {
+	prefs := map[string]any{
+		"Id":             "usersettings",
+		"SortBy":         "SortName",
+		"SortOrder":      "Ascending",
+		"GroupedFolders": libraryIDs,
+		"Client":         "emby",
+		"UserId":         userID,
+	}
+	body, _ := json.Marshal(prefs)
+
+	path := "/DisplayPreferences/usersettings?userId=" + url.QueryEscape(userID) + "&client=emby"
+	req, err := c.newRequest(ctx, http.MethodPost, path, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set(headerAuth, clientAuthHeader+`, Token="`+adminToken+`"`)
+
+	if err := c.do(req, http.StatusNoContent, nil); err != nil {
+		return fmt.Errorf("jellyfin.SetDisplayPreferences: %w", err)
+	}
+	return nil
+}
+
 // newRequest builds an HTTP request with common headers pre-set.
 func (c *Client) newRequest(ctx context.Context, method, path string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, body)

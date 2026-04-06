@@ -139,6 +139,11 @@ func (h *InviteHandler) HandleInviteSubmit(w http.ResponseWriter, r *http.Reques
 	// Apply library access policy (best-effort; user is already created).
 	_ = h.jellyfin.SetLibraryAccess(r.Context(), adminToken, jellyfinUID, inv.LibraryIDs)
 
+	// Group the user's libraries on the home screen if the invite requested it (best-effort).
+	if inv.GroupLibraries {
+		_ = h.jellyfin.SetDisplayPreferences(r.Context(), adminToken, jellyfinUID, inv.LibraryIDs)
+	}
+
 	// Record the registration (best-effort).
 	reg := domain.Registration{
 		ID:           uuid.NewString(),
