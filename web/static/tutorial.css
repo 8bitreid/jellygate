@@ -1,0 +1,200 @@
+.tutorial-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 2rem 1rem;
+}
+
+.tutorial-box {
+  width: 100%;
+  max-width: 600px;
+}
+
+.tutorial-progress {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.85rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.tutorial-content {
+  position: relative;
+  min-height: 400px;
+}
+
+.tutorial-step {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.tutorial-step.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-icon {
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.tutorial-step h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.step-description {
+  text-align: center;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.tutorial-card {
+  margin: 0;
+}
+
+.tutorial-card h3 {
+  color: var(--accent);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.tutorial-card p {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.tutorial-card p:last-child {
+  margin-bottom: 0;
+}
+
+.tutorial-card a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tutorial-card a:hover {
+  text-decoration: underline;
+}
+
+.step-note {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.app-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.app-item strong {
+  display: block;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.app-item ul {
+  margin-left: 1.5rem;
+  color: var(--text);
+}
+
+.app-item li {
+  margin-bottom: 0.25rem;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1.5rem 0;
+}
+
+.tutorial-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+.tutorial-nav {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-skip {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 0.45rem 1rem;
+}
+
+.btn-skip:hover {
+  color: var(--text);
+  border-color: var(--text);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .tutorial-controls {
+    flex-direction: column;
+  }
+
+  .tutorial-nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .btn-skip {
+    width: 100%;
+  }
+}

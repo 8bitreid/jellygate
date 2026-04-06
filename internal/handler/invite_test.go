@@ -178,11 +178,11 @@ func TestHandleInviteSubmit_Success(t *testing.T) {
 
 	h.HandleInviteSubmit(rec, req)
 
-	if rec.Code != http.StatusOK {
-		t.Errorf("want 200, got %d", rec.Code)
+	if rec.Code != http.StatusSeeOther {
+		t.Errorf("want 303, got %d", rec.Code)
 	}
-	if !strings.Contains(rec.Body.String(), "welcome") {
-		t.Error("expected success page")
+	if loc := rec.Header().Get("Location"); loc != "/tutorial" {
+		t.Errorf("expected redirect to /tutorial, got %q", loc)
 	}
 	if len(rs.regs) == 0 {
 		t.Error("expected registration to be recorded")
