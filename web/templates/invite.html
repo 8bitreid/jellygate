@@ -2,35 +2,155 @@
 
 {{define "title"}}join via invite — jellygate{{end}}
 
+{{define "head"}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  const password = document.getElementById('password');
+  const confirm = document.getElementById('confirm');
+  const matchMsg = document.getElementById('password-match-msg');
+  
+  // Password strength requirements
+  const requirements = {
+    length: { regex: /.{8,}/, element: document.getElementById('req-length'), check: document.getElementById('check-length') },
+    number: { regex: /\d/, element: document.getElementById('req-number'), check: document.getElementById('check-number') },
+    special: { regex: /[!@#$%^&*(),.?":{}|<>]/, element: document.getElementById('req-special'), check: document.getElementById('check-special') }
+  };
+  
+  function validatePasswordStrength() {
+    if (!password) return false;
+    
+    let allValid = true;
+    const pwd = password.value;
+    
+    Object.keys(requirements).forEach(key => {
+      const req = requirements[key];
+      const isValid = req.regex.test(pwd);
+      
+      if (req.element && req.check) {
+        if (isValid) {
+          req.check.textContent = '✓';
+          req.element.style.color = '#16a34a';
+        } else {
+          req.check.textContent = '○';
+          req.element.style.color = '#666';
+          allValid = false;
+        }
+      }
+    });
+    
+    if (pwd.length > 0 && !allValid) {
+      password.setCustomValidity('Password does not meet requirements');
+    } else {
+      password.setCustomValidity('');
+    }
+    
+    return allValid;
+  }
+  
+  function validatePasswords() {
+    if (!password || !confirm) return true;
+    
+    if (confirm.value === '') {
+      if (matchMsg) {
+        matchMsg.style.display = 'none';
+      }
+      confirm.setCustomValidity('');
+      return true;
+    }
+    
+    if (password.value !== confirm.value) {
+      confirm.setCustomValidity('Passwords do not match');
+      if (matchMsg) {
+        matchMsg.textContent = '❌ Passwords do not match';
+        matchMsg.style.color = '#dc2626';
+        matchMsg.style.display = 'block';
+      }
+      return false;
+    } else {
+      confirm.setCustomValidity('');
+      if (matchMsg) {
+        matchMsg.textContent = '✓ Passwords match';
+        matchMsg.style.color = '#16a34a';
+        matchMsg.style.display = 'block';
+      }
+      return true;
+    }
+  }
+  
+  if (password) {
+    password.addEventListener('input', function() {
+      validatePasswordStrength();
+      validatePasswords();
+    });
+  }
+  
+  if (confirm) {
+    confirm.addEventListener('input', validatePasswords);
+  }
+  
+  form?.addEventListener('submit', function(e) {
+    const strengthValid = validatePasswordStrength();
+    const matchValid = validatePasswords();
+    
+    if (!strengthValid || !matchValid) {
+      e.preventDefault();
+      if (!strengthValid) {
+        password.reportValidity();
+      } else if (!matchValid) {
+        confirm.reportValidity();
+      }
+    }
+  });
+});
+</script>
+{{end}}
+
 {{define "header"}}<header><span class="logo">jellygate</span></header>{{end}}
 
 {{define "content"}}
 <div class="login-wrap">
   <div class="login-box">
     {{if eq .Status "form"}}
-    <h1>create account</h1>
-    {{if .Label}}<p class="muted">invited: <strong>{{.Label}}</strong></p>{{end}}
+    <h1>let's get you set up</h1>
+    {{if .Label}}<p class="muted">Welcome, <strong>{{.Label}}</strong>!</p>{{end}}
+    <p style="margin-bottom: 1rem;">Choose a username and password to access your personal streaming library.</p>
     {{if .Error}}<div class="flash flash-error">{{.Error}}</div>{{end}}
     <div class="card">
       <form method="POST" action="/invite/{{.Token}}">
         <div class="form-row">
-          <label for="username">username</label>
+          <label for="username">pick a username</label>
           <input type="text" id="username" name="username" autocomplete="username" required>
         </div>
         <div class="form-row">
-          <label for="password">password</label>
-          <input type="password" id="password" name="password" autocomplete="new-password" required minlength="6">
+          <label for="password">create a password</label>
+          <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8">
+          <div id="password-requirements" style="margin-top: 0.5rem; font-size: 0.875rem;">
+            <div id="req-length" style="color: #666;">
+              <span id="check-length">○</span> At least 8 characters
+            </div>
+            <div id="req-number" style="color: #666;">
+              <span id="check-number">○</span> At least one number
+            </div>
+            <div id="req-special" style="color: #666;">
+              <span id="check-special">○</span> At least one special character (!@#$%^&*)
+            </div>
+          </div>
         </div>
         <div class="form-row">
-          <label for="confirm">confirm password</label>
+          <label for="confirm">confirm your password</label>
           <input type="password" id="confirm" name="confirm" autocomplete="new-password" required>
+          <small id="password-match-msg" style="color: #666; font-size: 0.875rem; display: none;"></small>
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:.5rem">create account</button>
+        <div style="background: #f0f9ff; border-left: 3px solid #3b82f6; padding: 0.75rem; margin: 1rem 0; border-radius: 4px;">
+          <strong>💡 Pro Tip:</strong> Save your username and password somewhere safe! You'll need them to log in on all your devices.
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:.5rem">create my account</button>
       </form>
     </div>
     {{else if eq .Status "success"}}
-    <h1>welcome!</h1>
-    <p>your account has been created. you can now sign in to jellyfin.</p>
+    <h1>you're all set!</h1>
+    <p>Your account is ready. Head over to the next page to learn how to start watching.</p>
     {{else}}
     <h1>invite unavailable</h1>
     <p class="muted">{{.Message}}</p>
