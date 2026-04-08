@@ -1,26 +1,38 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('form');
   const password = document.getElementById('password');
   const confirm = document.getElementById('confirm');
   const matchMsg = document.getElementById('password-match-msg');
-  
+
   // Password strength requirements
   const requirements = {
-    length: { regex: /.{8,}/, element: document.getElementById('req-length'), check: document.getElementById('check-length') },
-    number: { regex: /\d/, element: document.getElementById('req-number'), check: document.getElementById('check-number') },
-    special: { regex: /[!@#$%^&*(),.?":{}|<>]/, element: document.getElementById('req-special'), check: document.getElementById('check-special') }
+    length: {
+      regex: /.{8,}/,
+      element: document.getElementById('req-length'),
+      check: document.getElementById('check-length'),
+    },
+    number: {
+      regex: /\d/,
+      element: document.getElementById('req-number'),
+      check: document.getElementById('check-number'),
+    },
+    special: {
+      regex: /[!@#$%^&*(),.?":{}|<>]/,
+      element: document.getElementById('req-special'),
+      check: document.getElementById('check-special'),
+    },
   };
-  
+
   function validatePasswordStrength() {
     if (!password) return false;
-    
+
     let allValid = true;
     const pwd = password.value;
-    
-    Object.keys(requirements).forEach(key => {
+
+    Object.keys(requirements).forEach((key) => {
       const req = requirements[key];
       const isValid = req.regex.test(pwd);
-      
+
       if (req.element && req.check) {
         if (isValid) {
           req.check.textContent = '✓';
@@ -32,20 +44,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     });
-    
+
     return allValid;
   }
-  
+
   function validatePasswords() {
     if (!password || !confirm) return false;
-    
+
     if (confirm.value === '') {
       if (matchMsg) {
         matchMsg.style.display = 'none';
       }
       return false;
     }
-    
+
     if (password.value !== confirm.value) {
       if (matchMsg) {
         matchMsg.textContent = '❌ Passwords do not match';
@@ -62,14 +74,14 @@ document.addEventListener('DOMContentLoaded', function() {
       return true;
     }
   }
-  
+
   function updateSubmitButton() {
     const strengthValid = validatePasswordStrength();
     const matchValid = validatePasswords();
     const username = document.getElementById('username');
     const usernameValid = username && username.value.length > 0;
     const submitBtn = form?.querySelector('button[type="submit"]');
-    
+
     if (submitBtn) {
       if (strengthValid && matchValid && usernameValid) {
         submitBtn.disabled = false;
@@ -82,27 +94,27 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }
-  
+
   if (password) {
     password.addEventListener('input', updateSubmitButton);
   }
-  
+
   if (confirm) {
     confirm.addEventListener('input', updateSubmitButton);
   }
-  
+
   const username = document.getElementById('username');
   if (username) {
     username.addEventListener('input', updateSubmitButton);
   }
-  
+
   // Initialize submit button state
   updateSubmitButton();
-  
-  form?.addEventListener('submit', function(e) {
+
+  form?.addEventListener('submit', (e) => {
     const strengthValid = validatePasswordStrength();
     const matchValid = validatePasswords();
-    
+
     if (!strengthValid || !matchValid) {
       e.preventDefault();
     }
