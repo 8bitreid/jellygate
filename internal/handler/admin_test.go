@@ -316,6 +316,59 @@ func TestHandleCreateInvite(t *testing.T) {
 	}
 }
 
+// TestHandleCreateInvite_ExpiresAt_ParsedAsUTC verifies that the expires_at form
+// value (a naive datetime string sent by the client already converted to UTC) is
+// stored as a UTC time.Time — not interpreted in the server's local timezone.
+// This ensures a server in Chicago and a server in Boston behave identically.
+func TestHandleCreateInvite_ExpiresAt_ParsedAsUTC(t *testing.T) {
+	adm, ss, is := newAdmin(t, &stubJellyfinClient{token: "tok"})
+
+	sess := domain.Session{Token: "s", Username: "admin", JellyfinToken: "jf", ExpiresAt: time.Now().Add(time.Hour)}
+	ss.sessions["s"] = sess
+
+	w0 := httptest.NewRecorder()
+	req0 := httptest.NewRequest(http.MethodGet, "/admin", nil)
+	req0 = withSession(req0, sess)
+	adm.HandleDashboard(rec(w0), req0)
+
+	form := url.Values{"label": {"tz-test"}, "expires_at": {"2099-06-15T14:00"}}
+	for _, c := range w0.Result().Cookies() {
+		if c.Name == auth.CSRFCookieName {
+			form.Set(auth.CSRFFieldName, c.Value)
+		}
+	}
+
+	req := httptest.NewRequest(http.MethodPost, "/admin/invites", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	for _, c := range w0.Result().Cookies() {
+		req.AddCookie(c)
+	}
+	req = withSession(req, sess)
+
+	rec2 := httptest.NewRecorder()
+	adm.HandleCreateInvite(rec2, req)
+
+	if rec2.Code != http.StatusSeeOther {
+		t.Fatalf("want redirect 303, got %d", rec2.Code)
+	}
+
+	var created domain.Invite
+	for _, inv := range is.invites {
+		created = inv
+	}
+	if created.ExpiresAt == nil {
+		t.Fatal("expected ExpiresAt to be set")
+	}
+
+	wantUTC := time.Date(2099, 6, 15, 14, 0, 0, 0, time.UTC)
+	if !created.ExpiresAt.Equal(wantUTC) {
+		t.Errorf("expires_at: want %v (UTC), got %v (loc=%v)", wantUTC, *created.ExpiresAt, created.ExpiresAt.Location())
+	}
+	if created.ExpiresAt.Location() != time.UTC {
+		t.Errorf("expires_at location: want UTC, got %v", created.ExpiresAt.Location())
+	}
+}
+
 func TestHandleRevokeInvite(t *testing.T) {
 	adm, ss, is := newAdmin(t, &stubJellyfinClient{token: "tok"})
 

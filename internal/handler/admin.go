@@ -210,7 +210,7 @@ func (a *Admin) HandleCreateInvite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if raw := r.FormValue("expires_at"); raw != "" {
-		t, err := time.ParseInLocation("2006-01-02T15:04", raw, time.Local)
+		t, err := time.Parse("2006-01-02T15:04", raw)
 		if err == nil {
 			inv.ExpiresAt = &t
 		}
