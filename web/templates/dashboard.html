@@ -2,6 +2,10 @@
 
 {{define "title"}}dashboard — jellygate{{end}}
 
+{{define "head"}}
+<script src="/static/dashboard.js" defer></script>
+{{end}}
+
 {{define "content"}}
 <div class="card">
   <h2>create invite</h2>
@@ -11,14 +15,14 @@
       <label for="label">label</label>
       <input type="text" id="label" name="label" placeholder="e.g. friend's invite" required>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="form-grid">
       <div class="form-row">
         <label for="expires_at">expires (optional)</label>
         <input type="datetime-local" id="expires_at" name="expires_at">
       </div>
       <div class="form-row">
         <label for="max_uses">max uses (optional)</label>
-        <input type="number" id="max_uses" name="max_uses" min="1" placeholder="unlimited">
+        <input type="number" id="max_uses" name="max_uses" min="1" placeholder="unlimited" value="1">
       </div>
     </div>
     {{if .Libraries}}
@@ -52,12 +56,22 @@
     <tbody>
     {{range .Invites}}
     <tr>
-      <td>{{.Label}}</td>
-      <td><span class="invite-url">{{.URL}}</span></td>
-      <td>{{.UseCount}}{{if .MaxUses}} / {{.MaxUses}}{{else}} / ∞{{end}}</td>
-      <td>{{if .ExpiresAt}}{{.ExpiresAt.Format "2006-01-02 15:04"}}{{else}}never{{end}}</td>
-      <td><span class="badge badge-{{.StatusClass}}">{{.Status}}</span></td>
-      <td>
+      <td data-label="label">{{.Label}}</td>
+      <td data-label="link">
+        <div class="invite-url-cell">
+          <span class="invite-url">{{.URL}}</span>
+          <button class="btn-copy" data-url="{{.URL}}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+            copy
+          </button>
+        </div>
+      </td>
+      <td data-label="uses">{{.UseCount}}{{if .MaxUses}} / {{.MaxUses}}{{else}} / ∞{{end}}</td>
+      <td data-label="expires">{{if .ExpiresAt}}{{.ExpiresAt.Format "2006-01-02 15:04"}}{{else}}never{{end}}</td>
+      <td data-label="status"><span class="badge badge-{{.StatusClass}}">{{.Status}}</span></td>
+      <td data-label="actions">
         {{if .CanRevoke}}
         <form method="POST" action="/admin/invites/{{.ID}}/revoke" style="display:inline">
           <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
