@@ -6,12 +6,18 @@ import (
 	"html/template"
 	"log/slog"
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/google/uuid"
 
 	"github.com/rmewborne/jellygate/internal/domain"
 	"github.com/rmewborne/jellygate/web"
+)
+
+var (
+	reDigit   = regexp.MustCompile(`\d`)
+	reSpecial = regexp.MustCompile(`[!@#$%^&*]`)
 )
 
 // InviteHandler serves the public invite registration flow.
@@ -107,6 +113,13 @@ func (h *InviteHandler) HandleInviteSubmit(w http.ResponseWriter, r *http.Reques
 		h.render(w, invitePageData{
 			Status: "form", Token: token, Label: inv.Label,
 			Error: "passwords do not match",
+		})
+		return
+	}
+	if len(password) < 8 || !reDigit.MatchString(password) || !reSpecial.MatchString(password) {
+		h.render(w, invitePageData{
+			Status: "form", Token: token, Label: inv.Label,
+			Error: "password must be at least 8 characters and include a number and a special character (!@#$%^&*)",
 		})
 		return
 	}

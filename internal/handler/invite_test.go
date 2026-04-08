@@ -87,79 +87,74 @@ func TestHandleInviteForm_Valid(t *testing.T) {
 	}
 }
 
-func TestHandleInviteForm_InvalidToken(t *testing.T) {
-	h, _ := newInviteHandler(t, newInviteStore(), &stubJellyfinClient{token: "tok"})
-	req := httptest.NewRequest(http.MethodGet, "/invite/no-such-token", nil)
-	req.SetPathValue("token", "no-such-token")
-	rec := httptest.NewRecorder()
-
-	h.HandleInviteForm(rec, req)
-
-	if rec.Code != http.StatusOK {
-		t.Errorf("want 200, got %d", rec.Code)
+func TestHandleInviteForm_InvalidStates(t *testing.T) {
+	cases := []struct {
+		name         string
+		setupInvite  func(is *stubInviteStore, id, token string)
+		token        string
+		wantContains string
+	}{
+		{
+			name:         "invalid token",
+			setupInvite:  func(is *stubInviteStore, id, token string) {}, // no invite created
+			token:        "no-such-token",
+			wantContains: "invite unavailable",
+		},
+		{
+			name: "revoked",
+			setupInvite: func(is *stubInviteStore, id, token string) {
+				inv := activeInvite(id, token)
+				inv.Revoked = true
+				is.invites[id] = inv
+			},
+			token:        "tok-rev",
+			wantContains: "revoked",
+		},
+		{
+			name: "expired",
+			setupInvite: func(is *stubInviteStore, id, token string) {
+				inv := activeInvite(id, token)
+				past := time.Now().Add(-time.Hour)
+				inv.ExpiresAt = &past
+				is.invites[id] = inv
+			},
+			token:        "tok-exp",
+			wantContains: "expired",
+		},
+		{
+			name: "exhausted",
+			setupInvite: func(is *stubInviteStore, id, token string) {
+				inv := activeInvite(id, token)
+				max := 1
+				inv.MaxUses = &max
+				inv.UseCount = 1
+				is.invites[id] = inv
+			},
+			token:        "tok-ex",
+			wantContains: "maximum",
+		},
 	}
-	if !strings.Contains(rec.Body.String(), "invite unavailable") {
-		t.Error("expected error page")
-	}
-}
 
-func TestHandleInviteForm_Revoked(t *testing.T) {
-	is := newInviteStore()
-	id := uuid.NewString()
-	inv := activeInvite(id, "tok-rev")
-	inv.Revoked = true
-	is.invites[id] = inv
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			is := newInviteStore()
+			id := uuid.NewString()
+			tc.setupInvite(is, id, tc.token)
 
-	h, _ := newInviteHandler(t, is, &stubJellyfinClient{token: "tok"})
-	req := httptest.NewRequest(http.MethodGet, "/invite/tok-rev", nil)
-	req.SetPathValue("token", "tok-rev")
-	rec := httptest.NewRecorder()
+			h, _ := newInviteHandler(t, is, &stubJellyfinClient{token: "tok"})
+			req := httptest.NewRequest(http.MethodGet, "/invite/"+tc.token, nil)
+			req.SetPathValue("token", tc.token)
+			rec := httptest.NewRecorder()
 
-	h.HandleInviteForm(rec, req)
+			h.HandleInviteForm(rec, req)
 
-	if !strings.Contains(rec.Body.String(), "revoked") {
-		t.Error("expected revoked message")
-	}
-}
-
-func TestHandleInviteForm_Expired(t *testing.T) {
-	is := newInviteStore()
-	id := uuid.NewString()
-	inv := activeInvite(id, "tok-exp")
-	past := time.Now().Add(-time.Hour)
-	inv.ExpiresAt = &past
-	is.invites[id] = inv
-
-	h, _ := newInviteHandler(t, is, &stubJellyfinClient{token: "tok"})
-	req := httptest.NewRequest(http.MethodGet, "/invite/tok-exp", nil)
-	req.SetPathValue("token", "tok-exp")
-	rec := httptest.NewRecorder()
-
-	h.HandleInviteForm(rec, req)
-
-	if !strings.Contains(rec.Body.String(), "expired") {
-		t.Error("expected expired message")
-	}
-}
-
-func TestHandleInviteForm_Exhausted(t *testing.T) {
-	is := newInviteStore()
-	id := uuid.NewString()
-	inv := activeInvite(id, "tok-ex")
-	max := 1
-	inv.MaxUses = &max
-	inv.UseCount = 1
-	is.invites[id] = inv
-
-	h, _ := newInviteHandler(t, is, &stubJellyfinClient{token: "tok"})
-	req := httptest.NewRequest(http.MethodGet, "/invite/tok-ex", nil)
-	req.SetPathValue("token", "tok-ex")
-	rec := httptest.NewRecorder()
-
-	h.HandleInviteForm(rec, req)
-
-	if !strings.Contains(rec.Body.String(), "maximum") {
-		t.Error("expected exhausted message")
+			if rec.Code != http.StatusOK {
+				t.Errorf("want 200, got %d", rec.Code)
+			}
+			if !strings.Contains(rec.Body.String(), tc.wantContains) {
+				t.Errorf("expected response to contain %q", tc.wantContains)
+			}
+		})
 	}
 }
 
@@ -170,7 +165,7 @@ func TestHandleInviteSubmit_Success(t *testing.T) {
 
 	h, rs := newInviteHandler(t, is, &stubJellyfinClient{token: "tok"})
 
-	form := url.Values{"username": {"newuser"}, "password": {"secret1"}, "confirm": {"secret1"}}
+	form := url.Values{"username": {"newuser"}, "password": {"Secret1!"}, "confirm": {"Secret1!"}}
 	req := httptest.NewRequest(http.MethodPost, "/invite/tok-ok", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.SetPathValue("token", "tok-ok")
@@ -192,26 +187,73 @@ func TestHandleInviteSubmit_Success(t *testing.T) {
 	}
 }
 
-func TestHandleInviteSubmit_PasswordMismatch(t *testing.T) {
-	is := newInviteStore()
-	id := uuid.NewString()
-	is.invites[id] = activeInvite(id, "tok-mm")
-
-	h, _ := newInviteHandler(t, is, &stubJellyfinClient{token: "tok"})
-
-	form := url.Values{"username": {"newuser"}, "password": {"secret1"}, "confirm": {"different"}}
-	req := httptest.NewRequest(http.MethodPost, "/invite/tok-mm", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetPathValue("token", "tok-mm")
-	rec := httptest.NewRecorder()
-
-	h.HandleInviteSubmit(rec, req)
-
-	if !strings.Contains(rec.Body.String(), "do not match") {
-		t.Error("expected password mismatch error")
+func TestHandleInviteSubmit_ValidationErrors(t *testing.T) {
+	cases := []struct {
+		name              string
+		setupInvite       func(is *stubInviteStore, id, token string)
+		username          string
+		password          string
+		confirm           string
+		wantContains      string
+		skipUseCountCheck bool
+	}{
+		{
+			name:         "password mismatch",
+			setupInvite:  func(is *stubInviteStore, id, token string) { is.invites[id] = activeInvite(id, token) },
+			username:     "newuser",
+			password:     "Secret1!",
+			confirm:      "different",
+			wantContains: "do not match",
+		},
+		{
+			name: "already exhausted",
+			setupInvite: func(is *stubInviteStore, id, token string) {
+				inv := activeInvite(id, token)
+				max := 1
+				inv.MaxUses = &max
+				inv.UseCount = 1
+				is.invites[id] = inv
+			},
+			username:          "user",
+			password:          "Secret1!",
+			confirm:           "Secret1!",
+			wantContains:      "maximum",
+			skipUseCountCheck: true, // invite was already exhausted
+		},
+		{
+			name:         "weak password",
+			setupInvite:  func(is *stubInviteStore, id, token string) { is.invites[id] = activeInvite(id, token) },
+			username:     "user",
+			password:     "weak",
+			confirm:      "weak",
+			wantContains: "password must be at least 8 characters",
+		},
 	}
-	if is.invites[id].UseCount != 0 {
-		t.Error("use count should not increment on validation failure")
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			is := newInviteStore()
+			id := uuid.NewString()
+			token := "tok-val"
+			tc.setupInvite(is, id, token)
+
+			h, _ := newInviteHandler(t, is, &stubJellyfinClient{token: "tok"})
+
+			form := url.Values{"username": {tc.username}, "password": {tc.password}, "confirm": {tc.confirm}}
+			req := httptest.NewRequest(http.MethodPost, "/invite/"+token, strings.NewReader(form.Encode()))
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			req.SetPathValue("token", token)
+			rec := httptest.NewRecorder()
+
+			h.HandleInviteSubmit(rec, req)
+
+			if !strings.Contains(rec.Body.String(), tc.wantContains) {
+				t.Errorf("expected response to contain %q, got: %s", tc.wantContains, rec.Body.String())
+			}
+			if !tc.skipUseCountCheck && is.invites[id].UseCount != 0 {
+				t.Error("use count should not increment on validation error")
+			}
+		})
 	}
 }
 
@@ -222,7 +264,7 @@ func TestHandleInviteSubmit_JellyfinError(t *testing.T) {
 
 	h, _ := newInviteHandler(t, is, &stubJellyfinClientErr{err: errors.New("username taken")})
 
-	form := url.Values{"username": {"taken"}, "password": {"secret1"}, "confirm": {"secret1"}}
+	form := url.Values{"username": {"taken"}, "password": {"Secret1!"}, "confirm": {"Secret1!"}}
 	req := httptest.NewRequest(http.MethodPost, "/invite/tok-jf", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.SetPathValue("token", "tok-jf")
@@ -235,29 +277,5 @@ func TestHandleInviteSubmit_JellyfinError(t *testing.T) {
 	}
 	if is.invites[id].UseCount != 0 {
 		t.Error("use count should not increment on jellyfin failure")
-	}
-}
-
-func TestHandleInviteSubmit_AlreadyExhausted(t *testing.T) {
-	is := newInviteStore()
-	id := uuid.NewString()
-	inv := activeInvite(id, "tok-exh")
-	max := 1
-	inv.MaxUses = &max
-	inv.UseCount = 1
-	is.invites[id] = inv
-
-	h, _ := newInviteHandler(t, is, &stubJellyfinClient{token: "tok"})
-
-	form := url.Values{"username": {"user"}, "password": {"secret1"}, "confirm": {"secret1"}}
-	req := httptest.NewRequest(http.MethodPost, "/invite/tok-exh", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.SetPathValue("token", "tok-exh")
-	rec := httptest.NewRecorder()
-
-	h.HandleInviteSubmit(rec, req)
-
-	if !strings.Contains(rec.Body.String(), "maximum") {
-		t.Error("expected exhausted error page")
 	}
 }
