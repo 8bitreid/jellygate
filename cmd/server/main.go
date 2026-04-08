@@ -63,7 +63,7 @@ func main() {
 	// --- handlers ---
 	sessionMgr := auth.NewManager(sessionStore, secure)
 
-	adminHandler, err := handler.NewAdmin(sessionMgr, inviteStore, jf, settingsStore, baseURL, secure)
+	adminHandler, err := handler.NewAdmin(sessionMgr, inviteStore, registrationStore, jf, settingsStore, baseURL, secure)
 	if err != nil {
 		slog.Error("admin handler init", "err", err)
 		os.Exit(1)

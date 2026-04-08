@@ -19,13 +19,6 @@ import (
 
 // --- stubs ---
 
-type stubRegistrationStore struct{ regs []domain.Registration }
-
-func (s *stubRegistrationStore) Create(_ context.Context, reg domain.Registration) error {
-	s.regs = append(s.regs, reg)
-	return nil
-}
-
 type stubJellyfinClientErr struct{ err error }
 
 func (j *stubJellyfinClientErr) Authenticate(_ context.Context, _, _ string) (string, error) {

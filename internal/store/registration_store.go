@@ -31,3 +31,16 @@ func (s *RegistrationStore) Create(ctx context.Context, reg domain.Registration)
 	}
 	return nil
 }
+
+// CountByInviteID returns the number of registrations for a given invite.
+func (s *RegistrationStore) CountByInviteID(ctx context.Context, inviteID string) (int, error) {
+	var count int
+	err := s.pool.QueryRow(ctx,
+		`SELECT COUNT(*) FROM registrations WHERE invite_id = $1`,
+		inviteID,
+	).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("store.RegistrationStore.CountByInviteID: %w", err)
+	}
+	return count, nil
+}

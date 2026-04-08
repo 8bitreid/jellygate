@@ -32,6 +32,23 @@ func (s *stubSettingsStore) SetJellyfinAdminToken(_ context.Context, token strin
 	return nil
 }
 
+type stubRegistrationStore struct{ regs []domain.Registration }
+
+func (s *stubRegistrationStore) Create(_ context.Context, reg domain.Registration) error {
+	s.regs = append(s.regs, reg)
+	return nil
+}
+
+func (s *stubRegistrationStore) CountByInviteID(_ context.Context, inviteID string) (int, error) {
+	count := 0
+	for _, reg := range s.regs {
+		if reg.InviteID == inviteID {
+			count++
+		}
+	}
+	return count, nil
+}
+
 type stubInviteStore struct {
 	invites map[string]domain.Invite
 }
@@ -120,9 +137,10 @@ func newAdmin(t *testing.T, jf domain.JellyfinClient) (*handler.Admin, *stubSess
 	t.Helper()
 	ss := newSessionStore()
 	is := newInviteStore()
+	rs := &stubRegistrationStore{}
 	mgr := auth.NewManager(ss, false)
 	cfg := &stubSettingsStore{token: "stored-jf-tok"}
-	adm, err := handler.NewAdmin(mgr, is, jf, cfg, "http://localhost:8080", false)
+	adm, err := handler.NewAdmin(mgr, is, rs, jf, cfg, "http://localhost:8080", false)
 	if err != nil {
 		t.Fatalf("NewAdmin: %v", err)
 	}

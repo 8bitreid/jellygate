@@ -37,6 +37,22 @@
 
 <div class="card">
   <h2>invites</h2>
+  
+  <div class="tabs">
+    <a href="/admin?tab=active" class="tab {{if eq .ActiveTab "active"}}tab-active{{end}}">
+      Active <span class="tab-count">{{.ActiveCount}}</span>
+    </a>
+    <a href="/admin?tab=used" class="tab {{if eq .ActiveTab "used"}}tab-active{{end}}">
+      Used <span class="tab-count">{{.UsedCount}}</span>
+    </a>
+    <a href="/admin?tab=expired" class="tab {{if eq .ActiveTab "expired"}}tab-active{{end}}">
+      Expired <span class="tab-count">{{.ExpiredCount}}</span>
+    </a>
+    <a href="/admin?tab=revoked" class="tab {{if eq .ActiveTab "revoked"}}tab-active{{end}}">
+      Revoked <span class="tab-count">{{.RevokedCount}}</span>
+    </a>
+  </div>
+
   {{if .Invites}}
   <table>
     <thead>
@@ -44,6 +60,7 @@
         <th>label</th>
         <th>link</th>
         <th>uses</th>
+        {{if eq .ActiveTab "used"}}<th>registrations</th>{{end}}
         <th>expires</th>
         <th>status</th>
         <th></th>
@@ -55,6 +72,7 @@
       <td>{{.Label}}</td>
       <td><span class="invite-url">{{.URL}}</span></td>
       <td>{{.UseCount}}{{if .MaxUses}} / {{.MaxUses}}{{else}} / ∞{{end}}</td>
+      {{if eq $.ActiveTab "used"}}<td>{{.RegistrationCount}} user{{if ne .RegistrationCount 1}}s{{end}}</td>{{end}}
       <td>{{if .ExpiresAt}}{{.ExpiresAt.Format "2006-01-02 15:04"}}{{else}}never{{end}}</td>
       <td><span class="badge badge-{{.StatusClass}}">{{.Status}}</span></td>
       <td>
@@ -70,7 +88,7 @@
     </tbody>
   </table>
   {{else}}
-  <p class="empty">no invites yet — create one above</p>
+  <p class="empty">no invites in this category</p>
   {{end}}
 </div>
 {{end}}

@@ -36,6 +36,7 @@ type Notifier interface {
 // RegistrationStore records Jellyfin accounts created via invites.
 type RegistrationStore interface {
 	Create(ctx context.Context, reg Registration) error
+	CountByInviteID(ctx context.Context, inviteID string) (int, error)
 }
 
 // SettingsStore persists application-level configuration.

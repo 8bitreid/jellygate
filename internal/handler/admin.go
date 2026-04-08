@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"html/template"
@@ -20,6 +21,7 @@ import (
 type Admin struct {
 	sessions      *auth.Manager
 	invites       domain.InviteStore
+	registrations domain.RegistrationStore
 	jellyfin      domain.JellyfinClient
 	settings      domain.SettingsStore
 	baseURL       string
@@ -33,6 +35,7 @@ type Admin struct {
 func NewAdmin(
 	sessions *auth.Manager,
 	invites domain.InviteStore,
+	registrations domain.RegistrationStore,
 	jellyfin domain.JellyfinClient,
 	settings domain.SettingsStore,
 	baseURL string,
@@ -49,6 +52,7 @@ func NewAdmin(
 	return &Admin{
 		sessions:      sessions,
 		invites:       invites,
+		registrations: registrations,
 		jellyfin:      jellyfin,
 		settings:      settings,
 		baseURL:       baseURL,
@@ -69,19 +73,25 @@ type loginData struct {
 
 type inviteView struct {
 	domain.Invite
-	URL         string
-	Status      string
-	StatusClass string
-	CanRevoke   bool
+	URL              string
+	Status           string
+	StatusClass      string
+	CanRevoke        bool
+	RegistrationCount int
 }
 
 type dashboardData struct {
-	Username  string
-	CSRFToken string
-	Flash     string
-	FlashType string
-	Invites   []inviteView
-	Libraries []domain.Library
+	Username    string
+	CSRFToken   string
+	Flash       string
+	FlashType   string
+	Invites     []inviteView
+	Libraries   []domain.Library
+	ActiveTab   string
+	ActiveCount int
+	UsedCount   int
+	ExpiredCount int
+	RevokedCount int
 }
 
 // --- handlers ---
@@ -173,11 +183,64 @@ func (a *Admin) HandleDashboard(w http.ResponseWriter, r *http.Request) {
 
 	libs, _ := a.jellyfin.ListLibraries(r.Context(), sess.JellyfinToken)
 
+	// Convert all invites to views to compute counts and statuses
+	allViews := a.toViews(r.Context(), invites)
+
+	// Get the active tab from query params, default to "active"
+	activeTab := r.URL.Query().Get("tab")
+	if activeTab == "" {
+		activeTab = "active"
+	}
+
+	// Compute counts for each tab
+	var activeCount, usedCount, expiredCount, revokedCount int
+	for _, v := range allViews {
+		switch v.StatusClass {
+		case "active":
+			activeCount++
+		case "revoked":
+			revokedCount++
+		case "expired", "exhausted":
+			expiredCount++
+		}
+		if v.RegistrationCount > 0 {
+			usedCount++
+		}
+	}
+
+	// Filter invites based on active tab
+	var filteredViews []inviteView
+	for _, v := range allViews {
+		switch activeTab {
+		case "active":
+			if v.StatusClass == "active" {
+				filteredViews = append(filteredViews, v)
+			}
+		case "used":
+			if v.RegistrationCount > 0 {
+				filteredViews = append(filteredViews, v)
+			}
+		case "expired":
+			if v.StatusClass == "expired" || v.StatusClass == "exhausted" {
+				filteredViews = append(filteredViews, v)
+			}
+		case "revoked":
+			if v.StatusClass == "revoked" {
+				filteredViews = append(filteredViews, v)
+			}
+		}
+	}
+
 	data := dashboardData{
-		Username:  sess.Username,
-		CSRFToken: csrfToken,
-		Invites:   a.toViews(invites),
-		Libraries: libs,
+		Username:     sess.Username,
+		CSRFToken:    csrfToken,
+		Invites:      filteredViews,
+		Libraries:    libs,
+		ActiveTab:    activeTab,
+		ActiveCount:  activeCount,
+		UsedCount:    usedCount,
+		ExpiredCount: expiredCount,
+		RevokedCount: revokedCount,
 	}
 	if msg := r.URL.Query().Get("flash"); msg != "" {
 		data.Flash = msg
@@ -256,13 +319,15 @@ func (a *Admin) render(w http.ResponseWriter, tmpl *template.Template, data any)
 	}
 }
 
-func (a *Admin) toViews(invites []domain.Invite) []inviteView {
+func (a *Admin) toViews(ctx context.Context, invites []domain.Invite) []inviteView {
 	views := make([]inviteView, len(invites))
 	for i, inv := range invites {
+		regCount, _ := a.registrations.CountByInviteID(ctx, inv.ID)
 		v := inviteView{
-			Invite:    inv,
-			URL:       a.baseURL + "/invite/" + inv.Token,
-			CanRevoke: !inv.Revoked,
+			Invite:            inv,
+			URL:               a.baseURL + "/invite/" + inv.Token,
+			CanRevoke:         !inv.Revoked,
+			RegistrationCount: regCount,
 		}
 		switch {
 		case inv.Revoked:
