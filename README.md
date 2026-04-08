@@ -45,7 +45,7 @@ Access the admin dashboard at `http://localhost:8080`. On first visit you'll be 
 docker compose -f compose.dev.yaml up --build
 ```
 
-This builds from source and shares the host network so Jellyfin on `localhost:8096` is reachable.
+This builds from source and shares the host network so Jellyfin on `localhost:8097` is reachable.
 
 Run tests directly:
 
