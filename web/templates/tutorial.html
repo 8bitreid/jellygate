@@ -24,40 +24,47 @@
       <div class="tutorial-step active" data-step="1">
         <div class="step-icon">🎬</div>
         <h1>welcome!</h1>
-        <p class="step-description">Your account has been created. Let's get you started with everything you need to know.</p>
+        <p class="step-description">You're all set! Think of this as your personal streaming service—all your favorite movies and shows in one place.</p>
         <div class="card tutorial-card">
-          <h3>accessing the media server</h3>
-          <p>Visit <a href="{{.MediaURL}}" target="_blank" rel="noopener noreferrer"><strong>{{.MediaURL}}</strong></a> to access your media library.</p>
-          <p class="step-note">Log in with the username and password you just created.</p>
+          <h3>how to watch</h3>
+          <p>Visit <a href="{{.MediaURL}}" target="_blank" rel="noopener noreferrer"><strong>{{.MediaURL}}</strong></a> to start watching.</p>
+          <p class="step-note">Just log in with the username and password you created.</p>
         </div>
       </div>
 
       <!-- Step 2: Apps -->
       <div class="tutorial-step" data-step="2">
         <div class="step-icon">📱</div>
-        <h1>suggested apps</h1>
-        <p class="step-description">Get the best experience with these official Jellyfin apps:</p>
+        <h1>watch on your devices</h1>
+        <p class="step-description">You can watch on your phone, TV, tablet, or computer. Here are the apps we recommend:</p>
         <div class="card tutorial-card">
           <div class="app-list">
             <div class="app-item">
-              <strong>📱 Mobile</strong>
+              <strong>📱 iPhone & iPad</strong>
               <ul>
-                <li><strong>iOS:</strong> Jellyfin or Swiftfin from App Store</li>
-                <li><strong>Android:</strong> Jellyfin from Google Play</li>
+                <li><a href="https://apps.apple.com/us/app/jellyfin-mobile/id1480192618" target="_blank" rel="noopener noreferrer"><strong>Jellyfin</strong></a> - Our main app</li>
+                <li><a href="https://apps.apple.com/us/app/streamyfin/id6478804719" target="_blank" rel="noopener noreferrer"><strong>Streamyfin</strong></a> - A sleeker alternative</li>
               </ul>
             </div>
             <div class="app-item">
-              <strong>📺 TV</strong>
+              <strong>📺 Smart TVs</strong>
               <ul>
-                <li>Apple TV, Android TV, Fire TV, Roku</li>
-                <li>Search for "Jellyfin" in your TV's app store</li>
+                <li><strong>Roku:</strong> <a href="https://channelstore.roku.com/details/cc5e559d08d9ec87c5f30dcebdeebc12/jellyfin" target="_blank" rel="noopener noreferrer">Jellyfin app</a></li>
+                <li><strong>Apple TV:</strong> <a href="https://apps.apple.com/us/app/jellyfin-mobile/id1480192618" target="_blank" rel="noopener noreferrer">Jellyfin</a> or <a href="https://apps.apple.com/us/app/infuse-7/id1136220934" target="_blank" rel="noopener noreferrer">Infuse</a> <span class="step-note">(Infuse is paid)</span></li>
+                <li><strong>Fire TV or Android TV:</strong> Search for "Jellyfin" in your TV's app store</li>
               </ul>
             </div>
             <div class="app-item">
-              <strong>💻 Desktop</strong>
+              <strong>🤖 Android Phone</strong>
               <ul>
-                <li>Use the web browser or download Jellyfin Media Player</li>
-                <li>Available for Windows, Mac, and Linux</li>
+                <li>Get the <strong>Jellyfin</strong> app from the Google Play Store</li>
+              </ul>
+            </div>
+            <div class="app-item">
+              <strong>💻 Computer</strong>
+              <ul>
+                <li>Just use your web browser (Chrome, Safari, Firefox, etc.)</li>
+                <li>Or download the Jellyfin app for Windows or Mac</li>
               </ul>
             </div>
           </div>
@@ -69,17 +76,32 @@
       <div class="tutorial-step" data-step="3">
         <div class="step-icon">🎯</div>
         <h1>request & report</h1>
-        <p class="step-description">Need something? Found an issue? We've got you covered.</p>
+        <p class="step-description">Don't see what you're looking for? Want to binge that new Disney+ series or catch up on Paramount classics? Just ask—we'll get it added for you.</p>
         <div class="card tutorial-card">
-          <h3>🎬 request media</h3>
-          <p>Visit <a href="{{.SeerrURL}}" target="_blank" rel="noopener noreferrer"><strong>{{.SeerrURL}}</strong></a> to request new movies and TV shows.</p>
-          <p class="step-note">Use the same username you created to sign in.</p>
+          <h3>🎬 requesting media</h3>
+          <p>Visit <a href="{{.SeerrURL}}" target="_blank" rel="noopener noreferrer"><strong>{{.SeerrURL}}</strong></a> to request movies and TV shows. Search by title, studio, or even what streaming service it's on (Netflix, Disney+, HBO, etc.).</p>
+          <p class="step-note">Sign in with the same username you just created.</p>
+          
+          <p><strong>Here's how:</strong></p>
+          <ol style="margin-left: 1.5rem; margin-bottom: 1rem;">
+            <li>Search for what you want to watch</li>
+            <li>Click on it, then hit "Request"</li>
+            <li>We'll notify you when it's ready</li>
+          </ol>
 
           <div class="divider"></div>
 
-          <h3>🐛 report problems</h3>
-          <p>Found an issue with playback, subtitles, or quality? Report it on Seerr too!</p>
-          <p class="step-note">Click the "🐛 Report Issue" button on any movie or show.</p>
+          <h3>⚠️ reporting problems</h3>
+          <p>Something not quite right? Wrong audio, missing subtitles, quality issues?</p>
+          <ol style="margin-left: 1.5rem; margin-bottom: 1rem;">
+            <li>Find the title on Seerr</li>
+            <li>Click "⚠️ Report Issue"</li>
+            <li>Let us know what's up</li>
+          </ol>
+
+          <div class="divider"></div>
+
+          <p class="step-note"><strong>We're on it:</strong> Your requests and reports go straight to the admin and will be handled as quickly as possible.</p>
         </div>
       </div>
       {{end}}

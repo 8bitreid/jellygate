@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
   const steps = document.querySelectorAll('.tutorial-step');
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let currentStep = 1;
 
   function updateStep() {
-    steps.forEach(function(step, index) {
+    steps.forEach((step, index) => {
       if (index + 1 === currentStep) {
         step.classList.add('active');
       } else {
@@ -35,14 +35,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  nextBtn.addEventListener('click', function() {
+  nextBtn.addEventListener('click', () => {
     if (currentStep < totalSteps) {
       currentStep++;
       updateStep();
     }
   });
 
-  prevBtn.addEventListener('click', function() {
+  prevBtn.addEventListener('click', () => {
     if (currentStep > 1) {
       currentStep--;
       updateStep();

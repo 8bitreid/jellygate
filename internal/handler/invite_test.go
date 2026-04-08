@@ -82,7 +82,7 @@ func TestHandleInviteForm_Valid(t *testing.T) {
 	if rec.Code != http.StatusOK {
 		t.Errorf("want 200, got %d", rec.Code)
 	}
-	if !strings.Contains(rec.Body.String(), "create account") {
+	if !strings.Contains(rec.Body.String(), "create my account") {
 		t.Error("expected registration form")
 	}
 }

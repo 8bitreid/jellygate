@@ -37,7 +37,7 @@ func TestTutorialHandler_HandleTutorial(t *testing.T) {
 	}
 
 	body := w.Body.String()
-	for _, want := range []string{"suggested apps", testMediaURL, testSeerrURL} {
+	for _, want := range []string{"watch on your devices", testMediaURL, testSeerrURL} {
 		if !strings.Contains(body, want) {
 			t.Errorf("body missing %q", want)
 		}
