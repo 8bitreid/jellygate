@@ -70,11 +70,11 @@
               <h2 class="font-headline text-2xl font-bold mb-2">Create Your Account</h2>
               {{ if .Label }}
                 <p class="text-on-surface-variant text-sm">
-                  Welcome, <strong>{{ .Label }}</strong>! Fill in your details below.
+                  Welcome, <strong>{{ .Label }}</strong>! Fill in your details to create my account.
                 </p>
               {{ else }}
                 <p class="text-on-surface-variant text-sm">
-                  Fill in your details to start your cinematic journey.
+                  Fill in your details to create my account on The Family Cinema.
                 </p>
               {{ end }}
             </div>
@@ -163,6 +163,15 @@
                 ></small>
               </div>
 
+              {{ if .Error }}
+                <div
+                  class="rounded-xl bg-error/10 border border-error/30 px-4 py-3 text-error text-sm"
+                >
+                  {{ .Error }}
+                </div>
+              {{ end }}
+
+
               <div class="info-box">
                 <strong>💡 Pro Tip:</strong> Save your username and password somewhere safe! You'll
                 need them to log in on all your devices.
@@ -210,8 +219,10 @@
         <!-- Error State -->
         <div class="col-span-2 flex flex-col items-center text-center space-y-6">
           <span class="material-symbols-outlined text-8xl text-error">error</span>
-          <h1 class="font-headline font-extrabold text-4xl tracking-tight text-on-surface">
-            Invite Unavailable
+          <h1
+            class="font-headline font-extrabold text-4xl tracking-tight text-on-surface capitalize"
+          >
+            invite unavailable
           </h1>
           <p class="text-lg text-on-surface-variant">{{ .Message }}</p>
         </div>
