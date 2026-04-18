@@ -1,0 +1,25 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/jellygate ./cmd/server/"
+  bin = "./tmp/jellygate"
+  delay = 200
+  exclude_dir = ["tmp", ".git", "testdata"]
+  include_dir = ["cmd", "internal", "web"]
+  include_ext = ["go", "html", "css", "js"]
+  exclude_regex = ["_test.go"]
+  kill_delay = "200ms"
+  rerun = false
+
+[log]
+  main_only = true
+
+[color]
+  main = "magenta"
+  watcher = "cyan"
+  build = "yellow"
+  runner = "green"
+
+[misc]
+  clean_on_exit = true

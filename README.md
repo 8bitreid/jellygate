@@ -53,6 +53,52 @@ Run tests directly:
 go test ./...
 ```
 
+### linting & formatting
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Lint HTML templates:
+
+```bash
+npm run lint:html
+```
+
+Lint JavaScript:
+
+```bash
+npm run lint:js
+```
+
+Lint everything:
+
+```bash
+npm run lint
+```
+
+Format HTML templates:
+
+```bash
+npm run format:html
+```
+
+Format JavaScript:
+
+```bash
+npm run format:js
+```
+
+Format everything:
+
+```bash
+npm run format
+```
+
+**Git hooks:** Husky automatically formats and lints staged files on commit.
+
 ## project layout
 
 ```

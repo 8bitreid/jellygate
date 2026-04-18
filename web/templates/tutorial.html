@@ -1,123 +1,455 @@
-{{template "base" .}}
+{{ template "base" . }}
 
-{{define "title"}}welcome — jellygate{{end}}
+{{ define "title" }}App Guide - The Family Cinema{{ end }}
 
-{{define "head"}}
-  <link rel="stylesheet" href="/static/tutorial.css">
-  <script src="/static/tutorial.js" defer></script>
-{{end}}
-
-{{define "header"}}<header><span class="logo">jellygate</span></header>{{end}}
-
-{{define "content"}}
-<div class="tutorial-wrap">
-  <div class="tutorial-box">
-    <div class="tutorial-progress">
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-      <span class="progress-text" id="progressText">1 of {{if .SeerrURL}}3{{else}}2{{end}}</span>
+{{ define "header" }}
+  <header
+    class="fixed top-0 z-50 w-full bg-[#111318] flex justify-between items-center px-6 py-4 max-w-screen-2xl mx-auto left-0 right-0"
+  >
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-[#7bd0ff]">movie_filter</span>
+      <h1 class="text-xl font-bold tracking-tighter text-[#e2e2e9] font-headline">
+        The Family Cinema
+      </h1>
     </div>
+    <nav class="hidden md:flex items-center gap-8 font-headline text-sm font-bold">
+      <span class="text-[#7bd0ff]">App Guide</span>
+    </nav>
+  </header>
+{{ end }}
 
-    <div class="tutorial-content">
-      <!-- Step 1: Welcome -->
-      <div class="tutorial-step active" data-step="1">
-        <div class="step-icon">🎬</div>
-        <h1>welcome!</h1>
-        <p class="step-description">You're all set! Think of this as your personal streaming service—all your favorite movies and shows in one place.</p>
-        <div class="card tutorial-card">
-          <h3>how to watch</h3>
-          <p>Visit <a href="{{.MediaURL}}" target="_blank" rel="noopener noreferrer"><strong>{{.MediaURL}}</strong></a> to start watching.</p>
-          <p class="step-note">Just log in with the username and password you created.</p>
+{{ define "content" }}
+  <div class="max-w-screen-xl mx-auto pb-32">
+    <!-- Hero Section -->
+    <section class="mb-16">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1
+            class="text-5xl md:text-7xl font-extrabold tracking-tight mb-4 text-on-surface font-headline"
+          >
+            App Guide
+          </h1>
+          <p class="text-on-surface-variant text-lg max-w-xl">
+            Download the <span class="text-on-surface font-semibold">Jellyfin</span> app on your
+            device to connect to the server. All links below go to official app stores.
+          </p>
+        </div>
+        <div class="hidden lg:block">
+          <div class="flex -space-x-4">
+            <div
+              class="w-12 h-12 rounded-full border-4 border-background bg-surface-container flex items-center justify-center"
+            >
+              <span class="material-symbols-outlined text-sm">smartphone</span>
+            </div>
+            <div
+              class="w-12 h-12 rounded-full border-4 border-background bg-surface-container flex items-center justify-center"
+            >
+              <span class="material-symbols-outlined text-sm">tv</span>
+            </div>
+            <div
+              class="w-12 h-12 rounded-full border-4 border-background bg-surface-container flex items-center justify-center"
+            >
+              <span class="material-symbols-outlined text-sm">laptop</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <!-- Mobile Card -->
+      <div class="md:col-span-4 flex flex-col gap-6">
+        <div
+          class="bg-surface-container-low rounded-[2rem] p-8 h-full flex flex-col justify-between group hover:bg-surface-container transition-all duration-500"
+        >
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+              <span class="material-symbols-outlined text-primary text-3xl">smartphone</span>
+            </div>
+            <h2 class="text-2xl font-bold mb-2 font-headline">Mobile</h2>
+            <p class="text-on-surface-variant text-sm mb-8">
+              Take your collection anywhere with offline downloads and optimized streaming.
+            </p>
+          </div>
+          <div class="flex flex-col gap-3">
+            <a
+              class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:border-primary/50 transition-colors"
+              href="https://apps.apple.com/us/app/jellyfin-mobile/id1480192618"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined">phone_iphone</span>
+                <div>
+                  <span class="font-semibold block">Jellyfin</span>
+                  <span class="text-xs text-on-surface-variant">Official app · iOS / iPadOS</span>
+                </div>
+              </div>
+              <span class="material-symbols-outlined text-sm opacity-50">open_in_new</span>
+            </a>
+            <a
+              class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:border-primary/50 transition-colors"
+              href="https://play.google.com/store/apps/details?id=org.jellyfin.mobile"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined">android</span>
+                <div>
+                  <span class="font-semibold block">Jellyfin</span>
+                  <span class="text-xs text-on-surface-variant">Official app · Android</span>
+                </div>
+              </div>
+              <span class="material-symbols-outlined text-sm opacity-50">open_in_new</span>
+            </a>
+            <a
+              class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:border-secondary/50 transition-colors"
+              href="https://apps.apple.com/us/app/streamyfin/id6478804719"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-secondary">star</span>
+                <div>
+                  <span class="font-medium block">Streamyfin</span>
+                  <span class="text-xs text-on-surface-variant">iOS — sleek alternative</span>
+                </div>
+              </div>
+              <span class="material-symbols-outlined text-sm opacity-50">open_in_new</span>
+            </a>
+          </div>
         </div>
       </div>
 
-      <!-- Step 2: Apps -->
-      <div class="tutorial-step" data-step="2">
-        <div class="step-icon">📱</div>
-        <h1>watch on your devices</h1>
-        <p class="step-description">You can watch on your phone, TV, tablet, or computer. Here are the apps we recommend:</p>
-        <div class="card tutorial-card">
-          <div class="app-list">
-            <div class="app-item">
-              <strong>📱 iPhone & iPad</strong>
-              <ul>
-                <li><a href="https://apps.apple.com/us/app/jellyfin-mobile/id1480192618" target="_blank" rel="noopener noreferrer"><strong>Jellyfin</strong></a> - Our main app</li>
-                <li><a href="https://apps.apple.com/us/app/streamyfin/id6478804719" target="_blank" rel="noopener noreferrer"><strong>Streamyfin</strong></a> - A sleeker alternative</li>
-              </ul>
+      <!-- TV & Streaming Card (Centerpiece) -->
+      <div class="md:col-span-8">
+        <div
+          class="bg-surface-container-low rounded-[2rem] p-8 h-full relative overflow-hidden group"
+        >
+          <div class="relative z-10 grid md:grid-cols-2 gap-8 h-full">
+            <div class="flex flex-col justify-between">
+              <div>
+                <div
+                  class="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center mb-6"
+                >
+                  <span class="material-symbols-outlined text-secondary text-3xl">tv</span>
+                </div>
+                <h2 class="text-3xl font-bold mb-2 font-headline">TV &amp; Streaming</h2>
+                <p class="text-on-surface-variant text-sm mb-8">
+                  Experience true cinema at home. Native apps designed for the best large-screen
+                  navigation.
+                </p>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <a
+                  class="flex flex-col items-start gap-1 p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:bg-surface-container-high transition-colors"
+                  href="https://apps.apple.com/us/app/jellyfin-mobile/id1480192618"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span class="material-symbols-outlined text-2xl mb-1">desktop_windows</span>
+                  <span class="font-semibold text-sm">Jellyfin</span>
+                  <span class="text-xs text-on-surface-variant">Official · Apple TV</span>
+                </a>
+                <a
+                  class="flex flex-col items-start gap-1 p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:bg-surface-container-high transition-colors"
+                  href="https://apps.apple.com/us/app/infuse-7/id1136220934"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span class="material-symbols-outlined text-2xl mb-1 text-secondary">star</span>
+                  <span class="font-semibold text-sm">Infuse</span>
+                  <span class="text-xs text-on-surface-variant">by Firecore · paid · Apple TV</span>
+                </a>
+                <a
+                  class="flex flex-col items-start gap-1 p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:bg-surface-container-high transition-colors"
+                  href="https://channelstore.roku.com/details/cc5e559d08d9ec87c5f30dcebdeebc12/jellyfin"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span class="material-symbols-outlined text-2xl mb-1">settings_input_hdmi</span>
+                  <span class="font-semibold text-sm">Jellyfin</span>
+                  <span class="text-xs text-on-surface-variant">Official · Roku</span>
+                </a>
+                <a
+                  class="flex flex-col items-start gap-1 p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:bg-surface-container-high transition-colors"
+                  href="https://www.amazon.com/Jellyfin/dp/B081QNLYXK"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span class="material-symbols-outlined text-2xl mb-1">local_fire_department</span>
+                  <span class="font-semibold text-sm">Jellyfin</span>
+                  <span class="text-xs text-on-surface-variant">Official · Fire TV</span>
+                </a>
+                <a
+                  class="flex flex-col items-start gap-1 p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:bg-surface-container-high transition-colors"
+                  href="https://play.google.com/store/apps/details?id=org.jellyfin.androidtv"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span class="material-symbols-outlined text-2xl mb-1">smart_toy</span>
+                  <span class="font-semibold text-sm">Jellyfin</span>
+                  <span class="text-xs text-on-surface-variant">Official · Android TV</span>
+                </a>
+              </div>
             </div>
-            <div class="app-item">
-              <strong>📺 Smart TVs</strong>
-              <ul>
-                <li><strong>Roku:</strong> <a href="https://channelstore.roku.com/details/cc5e559d08d9ec87c5f30dcebdeebc12/jellyfin" target="_blank" rel="noopener noreferrer">Jellyfin app</a></li>
-                <li><strong>Apple TV:</strong> <a href="https://apps.apple.com/us/app/jellyfin-mobile/id1480192618" target="_blank" rel="noopener noreferrer">Jellyfin</a> or <a href="https://apps.apple.com/us/app/infuse-7/id1136220934" target="_blank" rel="noopener noreferrer">Infuse</a> <span class="step-note">(Infuse is paid)</span></li>
-                <li><strong>Fire TV or Android TV:</strong> Search for "Jellyfin" in your TV's app store</li>
-              </ul>
-            </div>
-            <div class="app-item">
-              <strong>🤖 Android Phone</strong>
-              <ul>
-                <li>Get the <strong>Jellyfin</strong> app from the Google Play Store</li>
-              </ul>
-            </div>
-            <div class="app-item">
-              <strong>💻 Computer</strong>
-              <ul>
-                <li>Just use your web browser (Chrome, Safari, Firefox, etc.)</li>
-                <li>Or download the Jellyfin app for Windows or Mac</li>
-              </ul>
+            <div
+              class="hidden md:flex items-center justify-center bg-surface-container-highest/30 rounded-3xl overflow-hidden border border-outline-variant/10 min-h-[200px]"
+            >
+              <div class="text-center p-8 opacity-40">
+                <span class="material-symbols-outlined text-[80px]">tv</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {{if .SeerrURL}}
-      <!-- Step 3: Request & Report -->
-      <div class="tutorial-step" data-step="3">
-        <div class="step-icon">🎯</div>
-        <h1>request & report</h1>
-        <p class="step-description">Don't see what you're looking for? Want to binge that new Disney+ series or catch up on Paramount classics? Just ask—we'll get it added for you.</p>
-        <div class="card tutorial-card">
-          <h3>🎬 requesting media</h3>
-          <p>Visit <a href="{{.SeerrURL}}" target="_blank" rel="noopener noreferrer"><strong>{{.SeerrURL}}</strong></a> to request movies and TV shows. Search by title, studio, or even what streaming service it's on (Netflix, Disney+, HBO, etc.).</p>
-          <p class="step-note">Sign in with the same username you just created.</p>
-          
-          <p><strong>Here's how:</strong></p>
-          <ol style="margin-left: 1.5rem; margin-bottom: 1rem;">
-            <li>Search for what you want to watch</li>
-            <li>Click on it, then hit "Request"</li>
-            <li>We'll notify you when it's ready</li>
-          </ol>
-
-          <div class="divider"></div>
-
-          <h3>⚠️ reporting problems</h3>
-          <p>Something not quite right? Wrong audio, missing subtitles, quality issues?</p>
-          <ol style="margin-left: 1.5rem; margin-bottom: 1rem;">
-            <li>Find the title on Seerr</li>
-            <li>Click "⚠️ Report Issue"</li>
-            <li>Let us know what's up</li>
-          </ol>
-
-          <div class="divider"></div>
-
-          <p class="step-note"><strong>We're on it:</strong> Your requests and reports go straight to the admin and will be handled as quickly as possible.</p>
+      <!-- Manual Setup / Server Address -->
+      <div class="md:col-span-12">
+        <div
+          class="relative rounded-[2rem] p-1 bg-gradient-to-br from-primary via-secondary to-primary-container"
+        >
+          <div class="bg-surface-container-lowest rounded-[1.9rem] p-8 md:p-12">
+            <div class="flex flex-col lg:flex-row gap-12 items-center">
+              <div class="flex-1 text-center lg:text-left">
+                <span
+                  class="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-widest uppercase mb-6"
+                  >Manual Setup</span
+                >
+                <h2 class="text-3xl md:text-4xl font-extrabold mb-6 font-headline">
+                  Connect Your Device
+                </h2>
+                <p class="text-on-surface-variant text-lg mb-8">
+                  When prompted by the app, use the following server address to access your
+                  collection.
+                </p>
+                <div
+                  class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/20 flex flex-col md:flex-row items-center justify-between gap-4"
+                >
+                  <div class="flex items-center gap-4">
+                    <div
+                      class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-primary flex-shrink-0"
+                    >
+                      <span class="material-symbols-outlined">dns</span>
+                    </div>
+                    <div>
+                      <p
+                        class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter"
+                      >
+                        Server Address
+                      </p>
+                      <code class="text-lg font-mono text-primary break-all" id="serverAddr"
+                        >{{ .MediaURL }}</code
+                      >
+                    </div>
+                  </div>
+                  <button
+                    id="copyAddrBtn"
+                    onclick="copyAddr()"
+                    class="bg-surface-container-high hover:bg-surface-container-highest px-6 py-3 rounded-xl transition-all flex items-center gap-2 text-sm font-bold border border-outline-variant/20 whitespace-nowrap"
+                  >
+                    <span class="material-symbols-outlined text-sm">content_copy</span>
+                    Copy URL
+                  </button>
+                </div>
+              </div>
+              <div
+                class="w-full lg:w-[400px] bg-surface-container-low rounded-3xl p-8 border border-outline-variant/20"
+              >
+                <h3 class="font-bold text-xl mb-6 font-headline">TV &amp; Device Setup</h3>
+                <ul class="space-y-6">
+                  <li class="flex gap-4">
+                    <span
+                      class="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-on-primary-fixed font-bold flex items-center justify-center text-sm"
+                      >1</span
+                    >
+                    <p class="text-sm text-on-surface-variant leading-relaxed">
+                      Pick one of the TV apps above and open it. Both
+                      <span class="text-on-surface font-semibold">Jellyfin</span> and
+                      <span class="text-on-surface font-semibold">Infuse</span> work great.
+                    </p>
+                  </li>
+                  <li class="flex gap-4">
+                    <span
+                      class="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-on-primary-fixed font-bold flex items-center justify-center text-sm"
+                      >2</span
+                    >
+                    <p class="text-sm text-on-surface-variant leading-relaxed">
+                      Select <span class="text-on-surface font-semibold">"Add Server"</span> on the
+                      initial launch screen.
+                    </p>
+                  </li>
+                  <li class="flex gap-4">
+                    <span
+                      class="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-on-primary-fixed font-bold flex items-center justify-center text-sm"
+                      >3</span
+                    >
+                    <p class="text-sm text-on-surface-variant leading-relaxed">
+                      Enter the URL above and log in with your
+                      <span class="text-on-surface font-semibold">account credentials</span>.
+                    </p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      {{end}}
-    </div>
 
-    <div class="tutorial-controls">
-      <a href="/tutorial/skip" class="btn btn-skip" id="skipBtn">skip tutorial</a>
-      <div class="tutorial-nav">
-        <button type="button" class="btn btn-secondary" id="prevBtn" disabled>← back</button>
-        <button type="button" class="btn btn-primary" id="nextBtn">next →</button>
-        <a href="/tutorial/complete" class="btn btn-primary" id="finishBtn" style="display:none">
-          go to jellyfin →
-        </a>
+      <!-- Request & Report -->
+      <div class="md:col-span-12">
+        <div
+          class="bg-surface-container-low rounded-[2rem] p-8 md:p-10 border border-outline-variant/10"
+        >
+          <div class="flex flex-col md:flex-row gap-10 items-start">
+            <div class="flex-1">
+              <div
+                class="w-12 h-12 rounded-2xl bg-tertiary/10 flex items-center justify-center mb-6"
+              >
+                <span class="material-symbols-outlined text-tertiary text-3xl">add_circle</span>
+              </div>
+              <h2 class="text-2xl font-bold mb-2 font-headline">Request &amp; Report</h2>
+              <p class="text-on-surface-variant mb-6">
+                Don't see what you're looking for? Request movies and TV shows — we'll get them
+                added for you.
+              </p>
+              <a
+                href="{{ if .SeerrURL }}
+                  {{ .SeerrURL }}
+                {{ else }}
+                  #
+                {{ end }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 bg-gradient-to-br from-tertiary to-tertiary-container/80 text-on-tertiary-fixed font-bold px-6 py-3 rounded-xl hover:scale-95 active:scale-95 transition-all shadow-lg"
+              >
+                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                Open Request Portal
+              </a>
+            </div>
+            <div class="flex-1 space-y-4">
+              <div class="flex gap-3">
+                <span
+                  class="flex-shrink-0 w-7 h-7 rounded-full bg-tertiary text-on-tertiary font-bold flex items-center justify-center text-xs"
+                  >1</span
+                >
+                <p class="text-sm text-on-surface-variant leading-relaxed">
+                  Search for the title you want to watch
+                </p>
+              </div>
+              <div class="flex gap-3">
+                <span
+                  class="flex-shrink-0 w-7 h-7 rounded-full bg-tertiary text-on-tertiary font-bold flex items-center justify-center text-xs"
+                  >2</span
+                >
+                <p class="text-sm text-on-surface-variant leading-relaxed">
+                  Click on it and hit <span class="text-on-surface font-semibold">"Request"</span>
+                </p>
+              </div>
+              <div class="flex gap-3">
+                <span
+                  class="flex-shrink-0 w-7 h-7 rounded-full bg-tertiary text-on-tertiary font-bold flex items-center justify-center text-xs"
+                  >3</span
+                >
+                <p class="text-sm text-on-surface-variant leading-relaxed">
+                  You'll be notified when it's ready to watch
+                </p>
+              </div>
+              <div class="mt-4 bg-primary/10 border-l-4 border-primary rounded-lg p-4">
+                <p class="text-sm text-on-surface">
+                  Use the same portal to <span class="font-semibold">report issues</span> — wrong
+                  audio, missing subtitles, quality problems.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Web & Desktop -->
+      <div class="md:col-span-12">
+        <div
+          class="bg-surface-container-low rounded-[2rem] p-10 flex flex-col md:flex-row items-center justify-between gap-8 border border-outline-variant/10"
+        >
+          <div class="flex items-center gap-6">
+            <div
+              class="w-16 h-16 rounded-2xl bg-tertiary-container/20 flex items-center justify-center"
+            >
+              <span class="material-symbols-outlined text-tertiary text-4xl">language</span>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold font-headline">Web &amp; Desktop</h2>
+              <p class="text-on-surface-variant">
+                Use the Jellyfin web player in any modern browser — no app install needed.
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-4">
+            <a
+              href="{{ .MediaURL }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="bg-gradient-to-br from-primary to-primary-container px-8 py-4 rounded-xl font-bold text-on-primary-fixed flex items-center gap-3 shadow-lg shadow-primary/20 hover:scale-95 active:scale-95 transition-transform duration-200"
+            >
+              Open Jellyfin
+              <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </a>
+            <a
+              href="/tutorial/complete"
+              class="bg-surface-container-high hover:bg-surface-container-highest px-8 py-4 rounded-xl font-bold transition-all border border-outline-variant/20 flex items-center gap-3"
+            >
+              <span class="material-symbols-outlined text-sm">check_circle</span>
+              Done
+            </a>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-{{end}}
+    <!-- Skip link -->
+    <div class="mt-10 text-center">
+      <a
+        href="/tutorial/skip"
+        class="text-on-surface-variant hover:text-on-surface text-sm transition-colors"
+        >Skip &amp; go to Jellyfin</a
+      >
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Nav -->
+  <nav
+    class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#111318]/80 backdrop-blur-xl md:hidden shadow-[0_-20px_40px_rgba(0,0,0,0.25)] rounded-t-3xl"
+  >
+    <div class="flex flex-col items-center justify-center text-[#e2e2e9]/50 px-6 py-2">
+      <span class="material-symbols-outlined">confirmation_number</span>
+      <span class="font-['Inter'] text-xs font-medium mt-1">Invites</span>
+    </div>
+    <div class="flex flex-col items-center justify-center text-[#e2e2e9]/50 px-6 py-2">
+      <span class="material-symbols-outlined">group</span>
+      <span class="font-['Inter'] text-xs font-medium mt-1">Users</span>
+    </div>
+    <div
+      class="flex flex-col items-center justify-center bg-gradient-to-br from-[#7bd0ff] to-[#00a4dc] text-white rounded-2xl px-6 py-2 transition-transform active:scale-95"
+    >
+      <span class="material-symbols-outlined">auto_stories</span>
+      <span class="font-['Inter'] text-xs font-medium mt-1">Guides</span>
+    </div>
+  </nav>
+
+  <script>
+    function copyAddr() {
+      const addr = document.getElementById("serverAddr").textContent.trim();
+      const btn = document.getElementById("copyAddrBtn");
+      navigator.clipboard.writeText(addr).then(() => {
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Copied!';
+        btn.classList.add("bg-success", "text-white");
+        setTimeout(() => {
+          btn.innerHTML =
+            '<span class="material-symbols-outlined text-sm">content_copy</span> Copy URL';
+          btn.classList.remove("bg-success", "text-white");
+        }, 2000);
+      });
+    }
+  </script>
+{{ end }}
