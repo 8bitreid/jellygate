@@ -1,6 +1,6 @@
 services:
   jellygate:
-    build: .
+    image: gcr.io/${GCR_PROJECT_ID}/jellygate:latest
     container_name: jellygate
     restart: unless-stopped
     env_file: [.env]

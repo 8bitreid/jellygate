@@ -18,6 +18,9 @@ import (
 	"github.com/rmewborne/jellygate/web"
 )
 
+// version is set at build time: -ldflags "-X main.version=v1.2.3"
+var version = "dev"
+
 func main() {
 	ctx := context.Background()
 
@@ -136,7 +139,7 @@ func main() {
 	// Wrap everything in security headers.
 	srv := middleware.SecureHeaders(mux)
 
-	slog.Info("jellygate starting", "addr", addr)
+	slog.Info("jellygate starting", "version", version, "addr", addr)
 	if err := http.ListenAndServe(addr, srv); err != nil {
 		slog.Error("server stopped", "err", err)
 		os.Exit(1)
