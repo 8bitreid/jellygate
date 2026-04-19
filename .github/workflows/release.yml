@@ -10,7 +10,7 @@ permissions:
   id-token: write # required for Workload Identity Federation (when upgrading from SA key)
 
 env:
-  IMAGE: gcr.io/${{ secrets.GCR_PROJECT_ID }}/jellygate
+  IMAGE: gcr.io/${{ vars.GCR_PROJECT_ID }}/jellygate
 
 jobs:
   test:
