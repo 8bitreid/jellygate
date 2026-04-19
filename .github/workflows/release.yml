@@ -5,16 +5,14 @@ on:
     tags:
       - 'v*.*.*'
 
-permissions:
-  contents: read
-  packages: write # allows pushing to ghcr.io
-
 env:
   IMAGE: ghcr.io/8bitreid/jellygate
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     container: golang:1.25-alpine
     steps:
       - uses: actions/checkout@v4
@@ -28,6 +26,9 @@ jobs:
   build-push:
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
