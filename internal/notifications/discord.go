@@ -13,26 +13,23 @@ import (
 const botName = "jellygate"
 
 // DiscordNotifier sends invite lifecycle events to a Discord webhook.
-//
-// Embed color is intentionally omitted: the Discord API requires color as a
-// decimal integer but gtuk/discordwebhook models it as *string, which
-// JSON-encodes as a quoted string and is silently ignored by Discord.
-//
-// Wiring: cmd/server/main.go selects DiscordNotifier when DISCORD_WEBHOOK_URL
-// is set, and falls back to notifications.NoopNotifier when it is not.
+// The webhook URL is read from settings on each notification; if not configured
+// the notification is silently skipped.
 type DiscordNotifier struct {
-	webhookURL string
+	settings domain.SettingsStore
 }
 
-// NewDiscordNotifier creates a DiscordNotifier targeting the given webhook URL.
-func NewDiscordNotifier(webhookURL string) *DiscordNotifier {
-	return &DiscordNotifier{webhookURL: webhookURL}
+// NewDiscordNotifier creates a DiscordNotifier that reads its webhook URL from settings.
+func NewDiscordNotifier(settings domain.SettingsStore) *DiscordNotifier {
+	return &DiscordNotifier{settings: settings}
 }
 
 // InviteCreated fires when an admin creates a new invite.
-// The context is accepted to satisfy the domain.Notifier interface; the
-// underlying HTTP client does not support cancellation.
-func (n *DiscordNotifier) InviteCreated(_ context.Context, inv domain.Invite) error {
+func (n *DiscordNotifier) InviteCreated(ctx context.Context, inv domain.Invite) error {
+	webhookURL, err := n.settings.GetDiscordWebhookURL(ctx)
+	if err != nil {
+		return nil // not configured — silently skip
+	}
 	inline := true
 	fields := []discordwebhook.Field{
 		{Name: strPtr("label"), Value: strPtr(inv.Label), Inline: &inline},
@@ -47,14 +44,18 @@ func (n *DiscordNotifier) InviteCreated(_ context.Context, inv domain.Invite) er
 			Fields: &fields,
 		}},
 	}
-	if err := discordwebhook.SendMessage(n.webhookURL, msg); err != nil {
+	if err := discordwebhook.SendMessage(webhookURL, msg); err != nil {
 		return fmt.Errorf("notifications.DiscordNotifier.InviteCreated: %w", err)
 	}
 	return nil
 }
 
 // InviteUsed fires when a user registers via an invite.
-func (n *DiscordNotifier) InviteUsed(_ context.Context, inv domain.Invite, username string) error {
+func (n *DiscordNotifier) InviteUsed(ctx context.Context, inv domain.Invite, username string) error {
+	webhookURL, err := n.settings.GetDiscordWebhookURL(ctx)
+	if err != nil {
+		return nil // not configured — silently skip
+	}
 	inline := true
 	fields := []discordwebhook.Field{
 		{Name: strPtr("new user"), Value: strPtr(username), Inline: &inline},
@@ -68,7 +69,7 @@ func (n *DiscordNotifier) InviteUsed(_ context.Context, inv domain.Invite, usern
 			Fields: &fields,
 		}},
 	}
-	if err := discordwebhook.SendMessage(n.webhookURL, msg); err != nil {
+	if err := discordwebhook.SendMessage(webhookURL, msg); err != nil {
 		return fmt.Errorf("notifications.DiscordNotifier.InviteUsed: %w", err)
 	}
 	return nil

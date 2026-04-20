@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/rmewborne/jellygate/internal/auth"
-	"github.com/rmewborne/jellygate/internal/domain"
 	"github.com/rmewborne/jellygate/internal/handler"
 	"github.com/rmewborne/jellygate/internal/jellyfin"
 	"github.com/rmewborne/jellygate/internal/middleware"
@@ -27,11 +26,7 @@ func main() {
 	// --- config ---
 	addr        := envOr("LISTEN_ADDR", ":8080")
 	dbURL       := mustEnv("DATABASE_URL")
-	jfURL       := mustEnv("JELLYFIN_URL")
-	baseURL     := mustEnv("BASE_URL")
-	discordURL  := os.Getenv("DISCORD_WEBHOOK_URL")
-	mediaURL    := mustEnv("MEDIA_URL")
-	seerrURL    := os.Getenv("SEERR_URL")
+	baseURL     := os.Getenv("BASE_URL") // optional — derived from request when empty
 	secure      := os.Getenv("SECURE_COOKIES") != "false"
 	behindProxy := os.Getenv("BEHIND_PROXY") == "true"
 
@@ -56,12 +51,10 @@ func main() {
 	settingsStore     := store.NewSettingsStore(pool)
 
 	// --- jellyfin client ---
-	jf := jellyfin.New(jfURL)
-	slog.Info("jellyfin configured", "url", jfURL)
-	slog.Info("base url configured", "baseURL", baseURL)
+	jf := jellyfin.New(settingsStore)
 
 	// --- notifier ---
-	notifier := buildNotifier(discordURL)
+	notifier := notifications.NewDiscordNotifier(settingsStore)
 
 	// --- handlers ---
 	sessionMgr := auth.NewManager(sessionStore, secure)
@@ -80,9 +73,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	tutorialHandler, err := handler.NewTutorialHandler(mediaURL, seerrURL)
+	tutorialHandler, err := handler.NewTutorialHandler(settingsStore)
 	if err != nil {
 		slog.Error("tutorial handler init", "err", err)
+		os.Exit(1)
+	}
+
+	setupHandler, err := handler.NewSetupHandler(settingsStore)
+	if err != nil {
+		slog.Error("setup handler init", "err", err)
 		os.Exit(1)
 	}
 
@@ -96,6 +95,10 @@ func main() {
 		os.Exit(1)
 	}
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServerFS(staticFS)))
+
+	// First-run setup — no auth required; accessible before Jellyfin URL is configured.
+	mux.HandleFunc("GET /setup", setupHandler.HandleSetupForm)
+	mux.HandleFunc("POST /setup", setupHandler.HandleSetupSubmit)
 
 	// Health — no auth, no rate limit; used by reverse proxy.
 	mux.HandleFunc("GET /health", handler.Health)
@@ -136,22 +139,14 @@ func main() {
 	mux.HandleFunc("GET /tutorial/skip", tutorialHandler.HandleTutorialSkip)
 	mux.HandleFunc("GET /tutorial/complete", tutorialHandler.HandleTutorialComplete)
 
-	// Wrap everything in security headers.
-	srv := middleware.SecureHeaders(mux)
+	// Wrap everything in security headers and setup guard.
+	srv := middleware.SecureHeaders(middleware.RequireSetup(settingsStore)(mux))
 
 	slog.Info("jellygate starting", "version", version, "addr", addr)
 	if err := http.ListenAndServe(addr, srv); err != nil {
 		slog.Error("server stopped", "err", err)
 		os.Exit(1)
 	}
-}
-
-func buildNotifier(webhookURL string) domain.Notifier {
-	if webhookURL != "" {
-		slog.Info("discord notifications enabled")
-		return notifications.NewDiscordNotifier(webhookURL)
-	}
-	return &notifications.NoopNotifier{}
 }
 
 func envOr(key, fallback string) string {

@@ -31,6 +31,18 @@ func (s *stubSettingsStore) SetJellyfinAdminToken(_ context.Context, token strin
 	s.token = token
 	return nil
 }
+func (s *stubSettingsStore) GetJellyfinURL(_ context.Context) (string, error) {
+	return "http://jellyfin.test", nil
+}
+func (s *stubSettingsStore) SetJellyfinURL(_ context.Context, _ string) error { return nil }
+func (s *stubSettingsStore) GetDiscordWebhookURL(_ context.Context) (string, error) {
+	return "", domain.ErrSettingNotFound
+}
+func (s *stubSettingsStore) SetDiscordWebhookURL(_ context.Context, _ string) error { return nil }
+func (s *stubSettingsStore) GetSeerrURL(_ context.Context) (string, error) {
+	return "", domain.ErrSettingNotFound
+}
+func (s *stubSettingsStore) SetSeerrURL(_ context.Context, _ string) error { return nil }
 
 type stubInviteStore struct {
 	invites map[string]domain.Invite

@@ -25,26 +25,35 @@ const (
 // Client is an HTTP client for the Jellyfin API.
 // It implements domain.JellyfinClient.
 type Client struct {
-	baseURL    string
+	settings   domain.SettingsStore
 	httpClient *http.Client
 }
 
-// New returns a Client targeting the given Jellyfin base URL.
-func New(baseURL string) *Client {
-	return &Client{
-		baseURL:    strings.TrimRight(baseURL, "/"),
-		httpClient: &http.Client{},
+// New returns a Client that reads the Jellyfin base URL from settings on each call.
+func New(settings domain.SettingsStore) *Client {
+	return &Client{settings: settings, httpClient: &http.Client{}}
+}
+
+func (c *Client) url(ctx context.Context) (string, error) {
+	u, err := c.settings.GetJellyfinURL(ctx)
+	if err != nil {
+		return "", fmt.Errorf("jellyfin: URL not configured: %w", err)
 	}
+	return strings.TrimRight(u, "/"), nil
 }
 
 // Authenticate exchanges admin credentials for a Jellyfin access token.
 func (c *Client) Authenticate(ctx context.Context, username, password string) (string, error) {
+	base, err := c.url(ctx)
+	if err != nil {
+		return "", err
+	}
 	body, _ := json.Marshal(map[string]string{
 		"Username": username,
 		"Pw":       password,
 	})
 
-	req, err := c.newRequest(ctx, http.MethodPost, "/Users/AuthenticateByName", bytes.NewReader(body))
+	req, err := c.newRequest(ctx, http.MethodPost, base+"/Users/AuthenticateByName", bytes.NewReader(body))
 	if err != nil {
 		return "", err
 	}
@@ -63,7 +72,11 @@ func (c *Client) Authenticate(ctx context.Context, username, password string) (s
 
 // ListLibraries returns all virtual folders (libraries) visible to the admin token.
 func (c *Client) ListLibraries(ctx context.Context, adminToken string) ([]domain.Library, error) {
-	req, err := c.newRequest(ctx, http.MethodGet, "/Library/VirtualFolders", nil)
+	base, err := c.url(ctx)
+	if err != nil {
+		return nil, err
+	}
+	req, err := c.newRequest(ctx, http.MethodGet, base+"/Library/VirtualFolders", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -86,12 +99,16 @@ func (c *Client) ListLibraries(ctx context.Context, adminToken string) ([]domain
 
 // CreateUser creates a new Jellyfin user and returns their user ID.
 func (c *Client) CreateUser(ctx context.Context, adminToken, username, password string) (string, error) {
+	base, err := c.url(ctx)
+	if err != nil {
+		return "", err
+	}
 	body, _ := json.Marshal(map[string]string{
 		"Name":     username,
 		"Password": password,
 	})
 
-	req, err := c.newRequest(ctx, http.MethodPost, "/Users/New", bytes.NewReader(body))
+	req, err := c.newRequest(ctx, http.MethodPost, base+"/Users/New", bytes.NewReader(body))
 	if err != nil {
 		return "", err
 	}
@@ -112,8 +129,10 @@ func (c *Client) CreateUser(ctx context.Context, adminToken, username, password 
 // SetLibraryAccess applies a library access policy to an existing user.
 // Only the listed libraryIDs will be enabled; all others are blocked.
 func (c *Client) SetLibraryAccess(ctx context.Context, adminToken, userID string, libraryIDs []string) error {
-	// Build the EnabledFolders list and set EnforceParentalRating=false,
-	// EnableAllFolders based on whether the list is empty.
+	base, err := c.url(ctx)
+	if err != nil {
+		return err
+	}
 	enableAll := len(libraryIDs) == 0
 	policy := map[string]any{
 		"EnableAllFolders": enableAll,
@@ -121,7 +140,7 @@ func (c *Client) SetLibraryAccess(ctx context.Context, adminToken, userID string
 	}
 	body, _ := json.Marshal(policy)
 
-	path := "/Users/" + url.PathEscape(userID) + "/Policy"
+	path := base + "/Users/" + url.PathEscape(userID) + "/Policy"
 	req, err := c.newRequest(ctx, http.MethodPost, path, bytes.NewReader(body))
 	if err != nil {
 		return err
@@ -135,10 +154,11 @@ func (c *Client) SetLibraryAccess(ctx context.Context, adminToken, userID string
 }
 
 // newRequest builds an HTTP request with common headers pre-set.
-func (c *Client) newRequest(ctx context.Context, method, path string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, body)
+// url must be the full URL (base already included by callers).
+func (c *Client) newRequest(ctx context.Context, method, url string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
-		return nil, fmt.Errorf("jellyfin: build request %s %s: %w", method, path, err)
+		return nil, fmt.Errorf("jellyfin: build request %s %s: %w", method, url, err)
 	}
 	req.Header.Set(headerContentType, applicationJSON)
 	req.Header.Set(headerAuth, clientAuthHeader)

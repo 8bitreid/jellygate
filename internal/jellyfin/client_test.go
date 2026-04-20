@@ -7,8 +7,27 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/rmewborne/jellygate/internal/domain"
 	"github.com/rmewborne/jellygate/internal/jellyfin"
 )
+
+// stubSettings is a minimal domain.SettingsStore that returns a fixed Jellyfin URL.
+type stubSettings struct{ url string }
+
+func (s *stubSettings) GetJellyfinURL(_ context.Context) (string, error) { return s.url, nil }
+func (s *stubSettings) SetJellyfinURL(_ context.Context, _ string) error  { return nil }
+func (s *stubSettings) GetJellyfinAdminToken(_ context.Context) (string, error) {
+	return "", domain.ErrSettingNotFound
+}
+func (s *stubSettings) SetJellyfinAdminToken(_ context.Context, _ string) error { return nil }
+func (s *stubSettings) GetDiscordWebhookURL(_ context.Context) (string, error) {
+	return "", domain.ErrSettingNotFound
+}
+func (s *stubSettings) SetDiscordWebhookURL(_ context.Context, _ string) error { return nil }
+func (s *stubSettings) GetSeerrURL(_ context.Context) (string, error) {
+	return "", domain.ErrSettingNotFound
+}
+func (s *stubSettings) SetSeerrURL(_ context.Context, _ string) error { return nil }
 
 // fakeJellyfin builds a test server that routes requests by method+path.
 func fakeJellyfin(t *testing.T, routes map[string]http.HandlerFunc) *httptest.Server {
@@ -35,7 +54,7 @@ func TestAuthenticate_Success(t *testing.T) {
 		},
 	})
 
-	client := jellyfin.New(srv.URL)
+	client := jellyfin.New(&stubSettings{url: srv.URL})
 	token, err := client.Authenticate(context.Background(), "admin", "secret")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -52,7 +71,7 @@ func TestAuthenticate_BadCredentials(t *testing.T) {
 		},
 	})
 
-	client := jellyfin.New(srv.URL)
+	client := jellyfin.New(&stubSettings{url: srv.URL})
 	_, err := client.Authenticate(context.Background(), "admin", "wrong")
 	if err == nil {
 		t.Fatal("expected error for bad credentials, got nil")
@@ -69,7 +88,7 @@ func TestListLibraries(t *testing.T) {
 		},
 	})
 
-	client := jellyfin.New(srv.URL)
+	client := jellyfin.New(&stubSettings{url: srv.URL})
 	libs, err := client.ListLibraries(context.Background(), "admin-token")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -89,7 +108,7 @@ func TestCreateUser_Success(t *testing.T) {
 		},
 	})
 
-	client := jellyfin.New(srv.URL)
+	client := jellyfin.New(&stubSettings{url: srv.URL})
 	uid, err := client.CreateUser(context.Background(), "admin-token", "newuser", "pass123")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -108,7 +127,7 @@ func TestCreateUser_SendsCorrectPayload(t *testing.T) {
 		},
 	})
 
-	client := jellyfin.New(srv.URL)
+	client := jellyfin.New(&stubSettings{url: srv.URL})
 	client.CreateUser(context.Background(), "tok", "alice", "hunter2")
 
 	if gotBody["Name"] != "alice" {
@@ -128,7 +147,7 @@ func TestSetLibraryAccess_SendsPolicy(t *testing.T) {
 		},
 	})
 
-	client := jellyfin.New(srv.URL)
+	client := jellyfin.New(&stubSettings{url: srv.URL})
 	err := client.SetLibraryAccess(context.Background(), "tok", "user-123", []string{"lib-1", "lib-2"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -151,7 +170,7 @@ func TestSetLibraryAccess_EmptyListEnablesAll(t *testing.T) {
 		},
 	})
 
-	client := jellyfin.New(srv.URL)
+	client := jellyfin.New(&stubSettings{url: srv.URL})
 	client.SetLibraryAccess(context.Background(), "tok", "user-123", []string{})
 
 	if gotPolicy["EnableAllFolders"] != true {
