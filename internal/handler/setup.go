@@ -25,10 +25,14 @@ func NewSetupHandler(settings domain.SettingsStore) (*SetupHandler, error) {
 }
 
 type setupData struct {
-	Error        string
-	JellyfinURL  string
-	SeerrURL     string
-	DiscordURL   string
+	Error       string
+	JellyfinURL string
+	SeerrURL    string
+	DiscordURL  string
+	// base template fields
+	Username  string
+	Flash     string
+	FlashType string
 }
 
 // HandleSetupForm renders GET /setup.
