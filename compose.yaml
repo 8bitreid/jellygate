@@ -1,6 +1,6 @@
 services:
   jellygate:
-    build: .
+    image: ghcr.io/8bitreid/jellygate:latest
     container_name: jellygate
     restart: unless-stopped
     env_file: [.env]
