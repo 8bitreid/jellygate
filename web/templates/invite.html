@@ -1,62 +1,232 @@
-{{template "base" .}}
+{{ template "base" . }}
 
-{{define "title"}}join via invite — jellygate{{end}}
+{{ define "title" }}Join - The Family Cinema{{ end }}
 
-{{define "head"}}
+{{ define "head" }}
   <script src="/static/invite.js" defer></script>
-{{end}}
+{{ end }}
 
-{{define "header"}}<header><span class="logo">jellygate</span></header>{{end}}
+{{ define "header" }}
+  <nav class="bg-[#111318] dark:bg-[#111318] docked full-width top-0 z-50">
+    <div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-[#7bd0ff]">movie_filter</span>
+        <span class="text-xl font-bold tracking-tighter text-[#e2e2e9] dark:text-[#e2e2e9]"
+          >The Family Cinema</span
+        >
+      </div>
+    </div>
+  </nav>
+{{ end }}
 
-{{define "content"}}
-<div class="login-wrap">
-  <div class="login-box">
-    {{if eq .Status "form"}}
-    <h1>let's get you set up</h1>
-    {{if .Label}}<p class="muted">Welcome, <strong>{{.Label}}</strong>!</p>{{end}}
-    <p style="margin-bottom: 1rem;">Choose a username and password to access your personal streaming library.</p>
-    {{if .Error}}<div class="flash flash-error">{{.Error}}</div>{{end}}
-    <div class="card">
-      <form method="POST" action="/invite/{{.Token}}">
-        <div class="form-row">
-          <label for="username">pick a username</label>
-          <input type="text" id="username" name="username" autocomplete="username" required>
-        </div>
-        <div class="form-row">
-          <label for="password">create a password</label>
-          <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8">
-          <div id="password-requirements" style="margin-top: 0.5rem; font-size: 0.875rem;">
-            <div id="req-length" style="color: #666;">
-              <span id="check-length">○</span> At least 8 characters
+{{ define "content" }}
+  <div class="flex items-center justify-center min-h-[70vh] relative">
+    <!-- Background Glow -->
+    <div class="absolute -inset-4 bg-primary/5 blur-3xl rounded-full opacity-50"></div>
+
+    <div class="relative max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {{ if eq .Status "form" }}
+        <!-- Left Side: Branding -->
+        <div class="space-y-8 hidden lg:block">
+          <div
+            class="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium"
+          >
+            <span class="material-symbols-outlined text-sm mr-2">auto_awesome</span>
+            Exclusive Access Granted
+          </div>
+          <h1
+            class="font-headline text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] text-on-surface"
+          >
+            You've been invited to
+            <span class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+              >The Family Cinema</span
+            >
+          </h1>
+          <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed">
+            Step into your private cinema. This is a sophisticated media system that puts you in
+            control of your entertainment experience.
+          </p>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 rounded-xl bg-surface-container-low border-l-4 border-primary">
+              <span class="material-symbols-outlined text-primary mb-2 block">high_quality</span>
+              <h3 class="font-bold text-on-surface">4K Streaming</h3>
+              <p class="text-xs text-on-surface-variant">Lossless quality playback</p>
             </div>
-            <div id="req-number" style="color: #666;">
-              <span id="check-number">○</span> At least one number
-            </div>
-            <div id="req-special" style="color: #666;">
-              <span id="check-special">○</span> At least one special character (!@#$%^&*)
+            <div class="p-4 rounded-xl bg-surface-container-low border-l-4 border-secondary">
+              <span class="material-symbols-outlined text-secondary mb-2 block">devices</span>
+              <h3 class="font-bold text-on-surface">Multi-Device</h3>
+              <p class="text-xs text-on-surface-variant">Watch on TV, mobile or web</p>
             </div>
           </div>
         </div>
-        <div class="form-row">
-          <label for="confirm">confirm your password</label>
-          <input type="password" id="confirm" name="confirm" autocomplete="new-password" required>
-          <small id="password-match-msg" style="color: #666; font-size: 0.875rem; display: none;"></small>
+
+        <!-- Right Side: Account Setup Form -->
+        <div class="relative">
+          <div class="absolute -inset-4 bg-primary/5 blur-3xl rounded-full"></div>
+          <div
+            class="relative glass-panel p-8 md:p-10 rounded-[2rem] shadow-2xl border border-outline-variant/10"
+          >
+            <div class="mb-8 text-center">
+              <h2 class="font-headline text-2xl font-bold mb-2">Create Your Account</h2>
+              {{ if .Label }}
+                <p class="text-on-surface-variant text-sm">
+                  Welcome, <strong>{{ .Label }}</strong>! Fill in your details to create my account.
+                </p>
+              {{ else }}
+                <p class="text-on-surface-variant text-sm">
+                  Fill in your details to create my account on The Family Cinema.
+                </p>
+              {{ end }}
+            </div>
+
+            <form method="POST" action="/invite/{{ .Token }}" class="space-y-6">
+              <!-- Username Field -->
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-on-surface-variant ml-1" for="username"
+                  >Username</label
+                >
+                <div class="relative group">
+                  <span
+                    class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors"
+                    >person</span
+                  >
+                  <input
+                    class="w-full bg-surface-container-lowest border-outline-variant/20 focus:border-primary focus:ring-0 rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/40 transition-all outline-none border"
+                    id="username"
+                    name="username"
+                    type="text"
+                    autocomplete="username"
+                    placeholder="e.g. cinemaphile_99"
+                    required
+                  />
+                </div>
+              </div>
+
+              <!-- Password Field -->
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-on-surface-variant ml-1" for="password"
+                  >Password</label
+                >
+                <div class="relative group">
+                  <span
+                    class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors"
+                    >lock</span
+                  >
+                  <input
+                    class="w-full bg-surface-container-lowest border-outline-variant/20 focus:border-primary focus:ring-0 rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/40 transition-all outline-none border"
+                    id="password"
+                    name="password"
+                    type="password"
+                    autocomplete="new-password"
+                    placeholder="••••••••••••"
+                    minlength="8"
+                    required
+                  />
+                </div>
+                <div id="password-requirements" class="mt-2 text-xs space-y-1">
+                  <div id="req-length" class="text-on-surface-variant/60">
+                    <span id="check-length">○</span> At least 8 characters
+                  </div>
+                  <div id="req-number" class="text-on-surface-variant/60">
+                    <span id="check-number">○</span> At least one number
+                  </div>
+                  <div id="req-special" class="text-on-surface-variant/60">
+                    <span id="check-special">○</span> At least one special character (!@#$%^&*)
+                  </div>
+                </div>
+              </div>
+
+              <!-- Confirm Password Field -->
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-on-surface-variant ml-1" for="confirm"
+                  >Confirm Password</label
+                >
+                <div class="relative group">
+                  <span
+                    class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors"
+                    >lock</span
+                  >
+                  <input
+                    class="w-full bg-surface-container-lowest border-outline-variant/20 focus:border-primary focus:ring-0 rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/40 transition-all outline-none border"
+                    id="confirm"
+                    name="confirm"
+                    type="password"
+                    autocomplete="new-password"
+                    placeholder="••••••••••••"
+                    required
+                  />
+                </div>
+                <small
+                  id="password-match-msg"
+                  class="text-on-surface-variant/60 text-xs"
+                  style="display: none;"
+                ></small>
+              </div>
+
+              {{ if .Error }}
+                <div
+                  class="rounded-xl bg-error/10 border border-error/30 px-4 py-3 text-error text-sm"
+                >
+                  {{ .Error }}
+                </div>
+              {{ end }}
+
+
+              <div class="info-box">
+                <strong>💡 Pro Tip:</strong> Save your username and password somewhere safe! You'll
+                need them to log in on all your devices.
+              </div>
+
+              <!-- Submit Button -->
+              <div class="pt-4">
+                <button
+                  class="w-full bg-gradient-to-br from-[#7bd0ff] to-[#00a4dc] hover:brightness-110 active:scale-95 text-on-primary-container font-bold py-4 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 text-lg"
+                  type="submit"
+                >
+                  <span>Create Account</span>
+                  <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-        <div class="info-box">
-          <strong>💡 Pro Tip:</strong> Save your username and password somewhere safe! You'll need them to log in on all your devices.
+      {{ else if eq .Status "success" }}
+        <!-- Success State -->
+        <div class="col-span-2 flex flex-col items-center text-center space-y-8">
+          <div class="relative">
+            <div class="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150"></div>
+            <div
+              class="relative w-24 h-24 bg-gradient-to-br from-primary to-primary-container rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(123,208,255,0.3)]"
+            >
+              <span class="material-symbols-outlined text-white text-5xl font-bold">check</span>
+            </div>
+          </div>
+          <h1 class="font-headline font-extrabold text-5xl tracking-tight text-on-surface">
+            Success!
+          </h1>
+          <p class="text-xl text-on-surface-variant max-w-2xl leading-relaxed">
+            Your account is ready. Head over to the next page to learn how to start watching.
+          </p>
+          <button
+            onclick="window.location.href='/tutorial'"
+            class="bg-gradient-to-br from-primary to-primary-container text-on-primary-container font-bold px-10 py-4 rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+          >
+            <span>Continue</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:.5rem">create my account</button>
-      </form>
+      {{ else }}
+        <!-- Error State -->
+        <div class="col-span-2 flex flex-col items-center text-center space-y-6">
+          <span class="material-symbols-outlined text-8xl text-error">error</span>
+          <h1
+            class="font-headline font-extrabold text-4xl tracking-tight text-on-surface capitalize"
+          >
+            invite unavailable
+          </h1>
+          <p class="text-lg text-on-surface-variant">{{ .Message }}</p>
+        </div>
+      {{ end }}
     </div>
-    {{else if eq .Status "success"}}
-    <h1>you're all set!</h1>
-    <p>Your account is ready. Head over to the next page to learn how to start watching.</p>
-    {{else}}
-    <div style="text-align: center;">
-      <h1>invite unavailable</h1>
-      <p class="muted">{{.Message}}</p>
-    </div>
-    {{end}}
   </div>
-</div>
-{{end}}
+{{ end }}

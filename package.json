@@ -1,0 +1,26 @@
+{
+  "name": "jellygate",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "lint:html": "htmlhint 'web/templates/**/*.html'",
+    "lint:js": "biome check web/static",
+    "lint": "npm run lint:html && npm run lint:js",
+    "format:html": "prettier --write 'web/templates/**/*.html'",
+    "format:js": "biome format --write web/static",
+    "format": "npm run format:html && npm run format:js",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.0",
+    "htmlhint": "^1.1.4",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "prettier-plugin-go-template": "^0.0.15"
+  },
+  "lint-staged": {
+    "web/templates/**/*.html": ["prettier --write", "htmlhint"],
+    "web/static/**/*.js": ["biome format --write --no-errors-on-unmatched", "biome check --no-errors-on-unmatched"]
+  }
+}

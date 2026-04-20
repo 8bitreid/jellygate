@@ -9,6 +9,9 @@ jellygate
 *.test
 *.out
 
+# Node/npm
+node_modules/
+
 # editor
 .idea/
 .vscode/

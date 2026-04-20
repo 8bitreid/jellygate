@@ -1,33 +1,116 @@
-{{template "base" .}}
+{{ template "base" . }}
 
-{{define "title"}}sign in — jellygate{{end}}
+{{ define "title" }}Sign In - The Family Cinema{{ end }}
 
-{{define "header"}}<header><span class="logo">jellygate</span></header>{{end}}
+{{ define "header" }}
+  <header class="flex justify-between items-center w-full px-6 py-8 max-w-screen-2xl mx-auto">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-3xl">movie_filter</span>
+      <span class="font-headline font-extrabold tracking-tighter text-2xl text-on-surface"
+        >The Family Cinema</span
+      >
+    </div>
+  </header>
+{{ end }}
 
-{{define "content"}}
-<div class="login-wrap">
-  <div class="login-box">
-    <h1>jellygate</h1>
-    {{if .IsSetup}}
-    <p>welcome! sign in with your jellyfin admin account to finish setup.</p>
-    {{else}}
-    <p>sign in with your jellyfin admin credentials</p>
-    {{end}}
-    {{if .Flash}}<div class="flash flash-{{.FlashType}}">{{.Flash}}</div>{{end}}
-    <div class="card">
-      <form method="POST" action="/admin/login">
-        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-        <div class="form-row">
-          <label for="username">username</label>
-          <input type="text" id="username" name="username" autocomplete="username" required>
+{{ define "content" }}
+  <div class="flex flex-col items-center justify-center min-h-[70vh] relative">
+    <!-- Cinematic Background -->
+    <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+      <div
+        class="absolute inset-0 bg-gradient-to-tr from-background via-background/90 to-primary/10 z-10"
+      ></div>
+      <div
+        class="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full"
+      ></div>
+      <div
+        class="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary/10 blur-[120px] rounded-full"
+      ></div>
+    </div>
+
+    <!-- Login Container -->
+    <div class="relative z-10 w-full max-w-[480px]">
+      <!-- Brand Identity -->
+      <div class="flex flex-col items-center mb-10 text-center">
+        <div
+          class="w-16 h-16 mb-6 flex items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-container shadow-[0_0_30px_rgba(123,208,255,0.3)]"
+        >
+          <span class="material-symbols-outlined text-4xl text-on-primary-fixed">movie</span>
         </div>
-        <div class="form-row">
-          <label for="password">password</label>
-          <input type="password" id="password" name="password" autocomplete="current-password" required>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:.5rem">sign in</button>
-      </form>
+        <h1 class="font-headline text-4xl font-extrabold tracking-tighter text-on-surface mb-2">
+          {{ if .IsSetup }}Welcome{{ else }}Welcome Back{{ end }}
+        </h1>
+        <p class="text-on-surface-variant text-lg font-medium opacity-80">
+          {{ if .IsSetup }}
+            To sign in, use your Jellyfin admin account to finish setup
+          {{ else }}
+            To sign in, use your Jellyfin admin credentials
+          {{ end }}
+        </p>
+      </div>
+
+      <!-- Login Form Panel -->
+      <div
+        class="glass-panel p-8 md:p-10 rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.4)] border border-outline-variant/10"
+      >
+        <form method="POST" action="/admin/login" class="space-y-6">
+          <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}" />
+
+          <!-- Username Field -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-on-surface-variant ml-1" for="username"
+              >Username</label
+            >
+            <div class="relative group">
+              <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant/50 group-focus-within:text-primary transition-colors"
+              >
+                <span class="material-symbols-outlined text-[20px]">person</span>
+              </div>
+              <input
+                class="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-2 focus:ring-primary rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/30 transition-all outline-none"
+                id="username"
+                name="username"
+                type="text"
+                autocomplete="username"
+                placeholder="your_handle"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-on-surface-variant ml-1" for="password"
+              >Password</label
+            >
+            <div class="relative group">
+              <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant/50 group-focus-within:text-primary transition-colors"
+              >
+                <span class="material-symbols-outlined text-[20px]">lock</span>
+              </div>
+              <input
+                class="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-2 focus:ring-primary rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/30 transition-all outline-none"
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            class="w-full bg-gradient-to-r from-primary to-primary-container hover:shadow-[0_8px_24px_rgba(123,208,255,0.25)] text-on-primary-fixed font-bold text-lg py-4 rounded-xl active:scale-[0.98] transition-all duration-200 mt-4"
+            type="submit"
+          >
+            Sign In
+          </button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
-{{end}}
+{{ end }}
