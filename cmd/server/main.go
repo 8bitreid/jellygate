@@ -85,6 +85,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	settingsHandler, err := handler.NewSettingsHandler(settingsStore, secure)
+	if err != nil {
+		slog.Error("settings handler init", "err", err)
+		os.Exit(1)
+	}
+
 	// --- routes ---
 	mux := http.NewServeMux()
 
@@ -126,6 +132,10 @@ func main() {
 		requireSession(http.HandlerFunc(adminHandler.HandleCreateInvite)))
 	mux.Handle("POST /admin/invites/{id}/revoke",
 		requireSession(http.HandlerFunc(adminHandler.HandleRevokeInvite)))
+	mux.Handle("GET /admin/settings",
+		requireSession(http.HandlerFunc(settingsHandler.HandleSettingsForm)))
+	mux.Handle("POST /admin/settings",
+		requireSession(http.HandlerFunc(settingsHandler.HandleSettingsSubmit)))
 
 	// Invite registration — rate limited (10 requests/hour per IP).
 	rateLimit := middleware.RateLimit(10, time.Hour, behindProxy)
