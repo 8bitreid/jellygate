@@ -176,7 +176,7 @@ func (a *Admin) HandleDashboard(w http.ResponseWriter, r *http.Request) {
 	data := dashboardData{
 		Username:  sess.Username,
 		CSRFToken: csrfToken,
-		Invites:   a.toViews(invites),
+		Invites:   a.toViews(invites, r),
 		Libraries: libs,
 	}
 	if msg := r.URL.Query().Get("flash"); msg != "" {
@@ -256,12 +256,20 @@ func (a *Admin) render(w http.ResponseWriter, tmpl *template.Template, data any)
 	}
 }
 
-func (a *Admin) toViews(invites []domain.Invite) []inviteView {
+func (a *Admin) toViews(invites []domain.Invite, r *http.Request) []inviteView {
+	base := a.baseURL
+	if base == "" {
+		scheme := "http"
+		if r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https" {
+			scheme = "https"
+		}
+		base = scheme + "://" + r.Host
+	}
 	views := make([]inviteView, len(invites))
 	for i, inv := range invites {
 		v := inviteView{
 			Invite:    inv,
-			URL:       a.baseURL + "/invite/" + inv.Token,
+			URL:       base + "/invite/" + inv.Token,
 			CanRevoke: !inv.Revoked,
 		}
 		switch {

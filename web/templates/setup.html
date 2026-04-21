@@ -1,0 +1,150 @@
+{{ template "base" . }}
+
+{{ define "title" }}Setup - The Family Cinema{{ end }}
+
+{{ define "header" }}
+  <header class="flex justify-between items-center w-full px-6 py-8 max-w-screen-2xl mx-auto">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-3xl">movie_filter</span>
+      <span class="font-headline font-extrabold tracking-tighter text-2xl text-on-surface"
+        >The Family Cinema</span
+      >
+    </div>
+  </header>
+{{ end }}
+
+{{ define "content" }}
+  <div class="flex flex-col items-center justify-center min-h-[70vh] relative">
+    <!-- Background -->
+    <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+      <div
+        class="absolute inset-0 bg-gradient-to-tr from-background via-background/90 to-primary/10 z-10"
+      ></div>
+      <div
+        class="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full"
+      ></div>
+      <div
+        class="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary/10 blur-[120px] rounded-full"
+      ></div>
+    </div>
+
+    <div class="relative z-10 w-full max-w-[520px]">
+      <!-- Brand Identity -->
+      <div class="flex flex-col items-center mb-10 text-center">
+        <div
+          class="w-16 h-16 mb-6 flex items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-container shadow-[0_0_30px_rgba(123,208,255,0.3)]"
+        >
+          <span class="material-symbols-outlined text-4xl text-on-primary-fixed">settings</span>
+        </div>
+        <h1 class="font-headline text-4xl font-extrabold tracking-tighter text-on-surface mb-2">
+          Welcome
+        </h1>
+        <p class="text-on-surface-variant text-lg font-medium opacity-80">
+          Connect jellygate to your Jellyfin server to get started
+        </p>
+      </div>
+
+      <!-- Setup Form Panel -->
+      <div
+        class="glass-panel p-8 md:p-10 rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.4)] border border-outline-variant/10"
+      >
+        {{ if .Error }}
+          <div
+            class="mb-6 px-4 py-3 rounded-xl bg-error/10 border border-error/20 text-error text-sm font-medium"
+          >
+            {{ .Error }}
+          </div>
+        {{ end }}
+
+
+        <form method="POST" action="/setup" class="space-y-6">
+          <!-- Jellyfin URL -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-on-surface-variant ml-1" for="jellyfin_url"
+              >Jellyfin URL <span class="text-error">*</span></label
+            >
+            <div class="relative group">
+              <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant/50 group-focus-within:text-primary transition-colors"
+              >
+                <span class="material-symbols-outlined text-[20px]">dns</span>
+              </div>
+              <input
+                class="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-2 focus:ring-primary rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/30 transition-all outline-none"
+                id="jellyfin_url"
+                name="jellyfin_url"
+                type="url"
+                placeholder="http://localhost:8096"
+                value="{{ .JellyfinURL }}"
+                required
+              />
+            </div>
+            <p class="text-xs text-on-surface-variant/60 ml-1">
+              The internal URL jellygate uses to reach your Jellyfin server
+            </p>
+          </div>
+
+          <!-- Seerr URL (optional) -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-on-surface-variant ml-1" for="seerr_url"
+              >Jellyseerr / Overseerr URL
+              <span class="text-on-surface-variant/50 font-normal">(optional)</span></label
+            >
+            <div class="relative group">
+              <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant/50 group-focus-within:text-primary transition-colors"
+              >
+                <span class="material-symbols-outlined text-[20px]">search</span>
+              </div>
+              <input
+                class="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-2 focus:ring-primary rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/30 transition-all outline-none"
+                id="seerr_url"
+                name="seerr_url"
+                type="url"
+                placeholder="http://localhost:5055"
+                value="{{ .SeerrURL }}"
+              />
+            </div>
+            <p class="text-xs text-on-surface-variant/60 ml-1">
+              Shown to new users in the onboarding tutorial for requesting media
+            </p>
+          </div>
+
+          <!-- Discord Webhook URL (optional) -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-on-surface-variant ml-1" for="discord_url"
+              >Discord Webhook URL
+              <span class="text-on-surface-variant/50 font-normal">(optional)</span></label
+            >
+            <div class="relative group">
+              <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant/50 group-focus-within:text-primary transition-colors"
+              >
+                <span class="material-symbols-outlined text-[20px]">notifications</span>
+              </div>
+              <input
+                class="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-2 focus:ring-primary rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/30 transition-all outline-none"
+                id="discord_url"
+                name="discord_url"
+                type="url"
+                placeholder="https://discord.com/api/webhooks/..."
+                value="{{ .DiscordURL }}"
+              />
+            </div>
+            <p class="text-xs text-on-surface-variant/60 ml-1">
+              Receive notifications when invites are created or used
+            </p>
+          </div>
+
+          <!-- Submit -->
+          <button
+            class="w-full bg-gradient-to-r from-primary to-primary-container hover:shadow-[0_8px_24px_rgba(123,208,255,0.25)] text-on-primary-fixed font-bold text-lg py-4 rounded-xl active:scale-[0.98] transition-all duration-200 mt-4"
+            type="submit"
+          >
+            Save & Continue
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+{{ end }}

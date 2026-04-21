@@ -301,74 +301,77 @@
       </div>
 
       <!-- Request & Report -->
-      <div class="md:col-span-12">
-        <div
-          class="bg-surface-container-low rounded-[2rem] p-8 md:p-10 border border-outline-variant/10"
-        >
-          <div class="flex flex-col md:flex-row gap-10 items-start">
-            <div class="flex-1">
-              <div
-                class="w-12 h-12 rounded-2xl bg-tertiary/10 flex items-center justify-center mb-6"
-              >
-                <span class="material-symbols-outlined text-tertiary text-3xl">add_circle</span>
-              </div>
-              <h2 class="text-2xl font-bold mb-2 font-headline">Request &amp; Report</h2>
-              <p class="text-on-surface-variant mb-6">
-                Don't see what you're looking for? Request movies and TV shows — we'll get them
-                added for you.
-              </p>
-              <a
-                href="{{ if .SeerrURL }}
-                  {{ .SeerrURL }}
-                {{ else }}
-                  #
-                {{ end }}"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 bg-gradient-to-br from-tertiary to-tertiary-container/80 text-on-tertiary-fixed font-bold px-6 py-3 rounded-xl hover:scale-95 active:scale-95 transition-all shadow-lg"
-              >
-                <span class="material-symbols-outlined text-sm">open_in_new</span>
-                Open Request Portal
-              </a>
-            </div>
-            <div class="flex-1 space-y-4">
-              <div class="flex gap-3">
-                <span
-                  class="flex-shrink-0 w-7 h-7 rounded-full bg-tertiary text-on-tertiary font-bold flex items-center justify-center text-xs"
-                  >1</span
+      {{ if .SeerrURL }}
+        <div class="md:col-span-12">
+          <div
+            class="bg-surface-container-low rounded-[2rem] p-8 md:p-10 border border-outline-variant/10"
+          >
+            <div class="flex flex-col md:flex-row gap-10 items-start">
+              <div class="flex-1">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-tertiary/10 flex items-center justify-center mb-6"
                 >
-                <p class="text-sm text-on-surface-variant leading-relaxed">
-                  Search for the title you want to watch
+                  <span class="material-symbols-outlined text-tertiary text-3xl">add_circle</span>
+                </div>
+                <h2 class="text-2xl font-bold mb-2 font-headline">Request &amp; Report</h2>
+                <p class="text-on-surface-variant mb-6">
+                  Don't see what you're looking for? Request movies and TV shows — we'll get them
+                  added for you.
                 </p>
-              </div>
-              <div class="flex gap-3">
-                <span
-                  class="flex-shrink-0 w-7 h-7 rounded-full bg-tertiary text-on-tertiary font-bold flex items-center justify-center text-xs"
-                  >2</span
+                <a
+                  href="{{ if .SeerrURL }}
+                    {{ .SeerrURL }}
+                  {{ else }}
+                    #
+                  {{ end }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 bg-gradient-to-br from-tertiary to-tertiary-container/80 text-on-tertiary-fixed font-bold px-6 py-3 rounded-xl hover:scale-95 active:scale-95 transition-all shadow-lg"
                 >
-                <p class="text-sm text-on-surface-variant leading-relaxed">
-                  Click on it and hit <span class="text-on-surface font-semibold">"Request"</span>
-                </p>
+                  <span class="material-symbols-outlined text-sm">open_in_new</span>
+                  Open Request Portal
+                </a>
               </div>
-              <div class="flex gap-3">
-                <span
-                  class="flex-shrink-0 w-7 h-7 rounded-full bg-tertiary text-on-tertiary font-bold flex items-center justify-center text-xs"
-                  >3</span
-                >
-                <p class="text-sm text-on-surface-variant leading-relaxed">
-                  You'll be notified when it's ready to watch
-                </p>
-              </div>
-              <div class="mt-4 bg-primary/10 border-l-4 border-primary rounded-lg p-4">
-                <p class="text-sm text-on-surface">
-                  Use the same portal to <span class="font-semibold">report issues</span> — wrong
-                  audio, missing subtitles, quality problems.
-                </p>
+              <div class="flex-1 space-y-4">
+                <div class="flex gap-3">
+                  <span
+                    class="flex-shrink-0 w-7 h-7 rounded-full bg-tertiary text-on-tertiary font-bold flex items-center justify-center text-xs"
+                    >1</span
+                  >
+                  <p class="text-sm text-on-surface-variant leading-relaxed">
+                    Search for the title you want to watch
+                  </p>
+                </div>
+                <div class="flex gap-3">
+                  <span
+                    class="flex-shrink-0 w-7 h-7 rounded-full bg-tertiary text-on-tertiary font-bold flex items-center justify-center text-xs"
+                    >2</span
+                  >
+                  <p class="text-sm text-on-surface-variant leading-relaxed">
+                    Click on it and hit <span class="text-on-surface font-semibold">"Request"</span>
+                  </p>
+                </div>
+                <div class="flex gap-3">
+                  <span
+                    class="flex-shrink-0 w-7 h-7 rounded-full bg-tertiary text-on-tertiary font-bold flex items-center justify-center text-xs"
+                    >3</span
+                  >
+                  <p class="text-sm text-on-surface-variant leading-relaxed">
+                    You'll be notified when it's ready to watch
+                  </p>
+                </div>
+                <div class="mt-4 bg-primary/10 border-l-4 border-primary rounded-lg p-4">
+                  <p class="text-sm text-on-surface">
+                    Use the same portal to <span class="font-semibold">report issues</span> — wrong
+                    audio, missing subtitles, quality problems.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      {{ end }}
+
 
       <!-- Web & Desktop -->
       <div class="md:col-span-12">

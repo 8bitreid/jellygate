@@ -42,4 +42,10 @@ type RegistrationStore interface {
 type SettingsStore interface {
 	GetJellyfinAdminToken(ctx context.Context) (string, error)
 	SetJellyfinAdminToken(ctx context.Context, token string) error
+	GetJellyfinURL(ctx context.Context) (string, error)
+	SetJellyfinURL(ctx context.Context, url string) error
+	GetDiscordWebhookURL(ctx context.Context) (string, error)
+	SetDiscordWebhookURL(ctx context.Context, url string) error
+	GetSeerrURL(ctx context.Context) (string, error)
+	SetSeerrURL(ctx context.Context, url string) error
 }

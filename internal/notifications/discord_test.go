@@ -13,6 +13,26 @@ import (
 	"github.com/rmewborne/jellygate/internal/notifications"
 )
 
+// stubSettings is a minimal domain.SettingsStore that returns a fixed Discord webhook URL.
+type stubSettings struct{ webhookURL string }
+
+func (s *stubSettings) GetDiscordWebhookURL(_ context.Context) (string, error) {
+	return s.webhookURL, nil
+}
+func (s *stubSettings) SetDiscordWebhookURL(_ context.Context, _ string) error { return nil }
+func (s *stubSettings) GetJellyfinURL(_ context.Context) (string, error) {
+	return "", domain.ErrSettingNotFound
+}
+func (s *stubSettings) SetJellyfinURL(_ context.Context, _ string) error { return nil }
+func (s *stubSettings) GetJellyfinAdminToken(_ context.Context) (string, error) {
+	return "", domain.ErrSettingNotFound
+}
+func (s *stubSettings) SetJellyfinAdminToken(_ context.Context, _ string) error { return nil }
+func (s *stubSettings) GetSeerrURL(_ context.Context) (string, error) {
+	return "", domain.ErrSettingNotFound
+}
+func (s *stubSettings) SetSeerrURL(_ context.Context, _ string) error { return nil }
+
 func fakeWebhook(t *testing.T, statusCode int, fn func(body map[string]any)) *httptest.Server {
 	t.Helper()
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -78,7 +98,7 @@ func TestDiscordNotifier_InviteCreated(t *testing.T) {
 	srv := fakeWebhook(t, http.StatusNoContent, func(body map[string]any) { got = body })
 	defer srv.Close()
 
-	n := notifications.NewDiscordNotifier(srv.URL)
+	n := notifications.NewDiscordNotifier(&stubSettings{webhookURL: srv.URL})
 	inv := domain.Invite{
 		ID:        "inv-1",
 		Token:     "tok",
@@ -115,7 +135,7 @@ func TestDiscordNotifier_InviteCreated_WithExpiry(t *testing.T) {
 	srv := fakeWebhook(t, http.StatusNoContent, func(body map[string]any) { got = body })
 	defer srv.Close()
 
-	n := notifications.NewDiscordNotifier(srv.URL)
+	n := notifications.NewDiscordNotifier(&stubSettings{webhookURL: srv.URL})
 	exp := time.Date(2026, 12, 31, 23, 59, 0, 0, time.UTC)
 	max := 5
 	inv := domain.Invite{Label: "vip", CreatedBy: "admin", ExpiresAt: &exp, MaxUses: &max}
@@ -169,7 +189,7 @@ func TestDiscordNotifier_InviteUsed(t *testing.T) {
 			srv := fakeWebhook(t, http.StatusNoContent, func(body map[string]any) { got = body })
 			defer srv.Close()
 
-			n := notifications.NewDiscordNotifier(srv.URL)
+			n := notifications.NewDiscordNotifier(&stubSettings{webhookURL: srv.URL})
 			if err := n.InviteUsed(context.Background(), tt.inv, "alice"); err != nil {
 				t.Fatalf("InviteUsed: %v", err)
 			}
@@ -203,7 +223,7 @@ func TestDiscordNotifier_WebhookError(t *testing.T) {
 	srv := fakeWebhook(t, http.StatusInternalServerError, nil)
 	defer srv.Close()
 
-	n := notifications.NewDiscordNotifier(srv.URL)
+	n := notifications.NewDiscordNotifier(&stubSettings{webhookURL: srv.URL})
 	err := n.InviteCreated(context.Background(), domain.Invite{Label: "x", CreatedBy: "admin"})
 	if err == nil {
 		t.Fatal("expected error on non-2xx response")
