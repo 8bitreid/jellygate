@@ -67,7 +67,7 @@ To embed a version string (shown in startup logs):
 
 ```bash
 go build \
-  -ldflags="-X github.com/rmewborne/jellygate/cmd/server.version=v0.1.0" \
+  -ldflags="-X main.version=v0.1.0" \
   -o jellygate ./cmd/server
 ```
 
