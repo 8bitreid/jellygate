@@ -4,9 +4,9 @@ WORKDIR /src
 # Install Node.js for building CSS
 RUN apk add --no-cache nodejs npm
 
-# Copy package files and install dependencies
+# Copy package files and install dependencies (including dev dependencies for Tailwind)
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production --ignore-scripts || npm install --only=production --ignore-scripts
+RUN npm ci --ignore-scripts || npm install --ignore-scripts
 
 # Copy Tailwind config and input CSS
 COPY tailwind.config.js ./
