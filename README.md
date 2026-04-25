@@ -1,5 +1,10 @@
 # jellygate
 
+[![ci](https://github.com/8bitreid/jellygate/actions/workflows/ci.yml/badge.svg)](https://github.com/8bitreid/jellygate/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/8bitreid/jellygate)](https://goreportcard.com/report/github.com/8bitreid/jellygate)
+[![GitHub release](https://img.shields.io/github/v/release/8bitreid/jellygate)](https://github.com/8bitreid/jellygate/releases/latest)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/8bitreid/jellygate)](https://github.com/8bitreid/jellygate)
+
 A self-hosted invite management system for [Jellyfin](https://jellyfin.org). Admins generate shareable invite links; anyone with a link can self-register a Jellyfin account without needing admin access.
 
 ## features
