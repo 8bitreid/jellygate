@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build:css": "npx tailwindcss -i web/static/input.css -o web/static/style.css --minify",
+    "watch:css": "npx tailwindcss -i web/static/input.css -o web/static/style.css --watch",
     "lint:html": "htmlhint 'web/templates/**/*.html'",
     "lint:js": "biome check web/static",
     "lint": "npm run lint:html && npm run lint:js",
@@ -17,10 +19,17 @@
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
-    "prettier-plugin-go-template": "^0.0.15"
+    "prettier-plugin-go-template": "^0.0.15",
+    "tailwindcss": "^3.4.19"
   },
   "lint-staged": {
-    "web/templates/**/*.html": ["prettier --write", "htmlhint"],
-    "web/static/**/*.js": ["biome format --write --no-errors-on-unmatched", "biome check --no-errors-on-unmatched"]
+    "web/templates/**/*.html": [
+      "prettier --write",
+      "htmlhint"
+    ],
+    "web/static/**/*.js": [
+      "biome format --write --no-errors-on-unmatched",
+      "biome check --no-errors-on-unmatched"
+    ]
   }
 }

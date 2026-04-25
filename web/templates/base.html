@@ -9,96 +9,13 @@
         rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎬</text></svg>"
       />
-      <script src="/static/tailwind.js"></script>
+      <link rel="stylesheet" href="/static/style.css" />
       <!-- prettier-ignore -->
       <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" crossorigin="anonymous" />
       <!-- NOSONAR -->
       <!-- prettier-ignore -->
       <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" crossorigin="anonymous" />
       <!-- NOSONAR -->
-      <script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              colors: {
-                "tertiary-fixed-dim": "#bac6e8",
-                "tertiary-fixed": "#d8e2ff",
-                "on-tertiary": "#24304b",
-                "on-primary-fixed-variant": "#004c69",
-                "primary-fixed-dim": "#7bd0ff",
-                outline: "#87929a",
-                "on-tertiary-fixed": "#0e1b35",
-                "error-container": "#93000a",
-                "on-secondary-fixed-variant": "#6e2288",
-                secondary: "#efb0ff",
-                "on-primary": "#003549",
-                "surface-container-highest": "#33353a",
-                "secondary-fixed-dim": "#efb0ff",
-                "inverse-primary": "#00668a",
-                "on-surface": "#e2e2e9",
-                "surface-container-high": "#282a2f",
-                "inverse-surface": "#e2e2e9",
-                "surface-container-lowest": "#0c0e13",
-                "on-secondary": "#54006e",
-                "secondary-fixed": "#fad7ff",
-                tertiary: "#bac6e8",
-                "surface-container": "#1e1f25",
-                "on-secondary-container": "#e99bff",
-                "on-tertiary-container": "#24314c",
-                "surface-variant": "#33353a",
-                "on-background": "#e2e2e9",
-                "on-surface-variant": "#bdc8d0",
-                "on-error": "#690005",
-                "surface-container-low": "#1a1b21",
-                "on-error-container": "#ffdad6",
-                "surface-bright": "#37393f",
-                error: "#ffb4ab",
-                "on-tertiary-fixed-variant": "#3a4663",
-                "outline-variant": "#3e484f",
-                "inverse-on-surface": "#2e3036",
-                "secondary-container": "#71258b",
-                "on-secondary-fixed": "#330044",
-                "primary-container": "#00a4dc",
-                surface: "#111318",
-                "surface-dim": "#111318",
-                "on-primary-fixed": "#001e2c",
-                "tertiary-container": "#8c99b9",
-                "surface-tint": "#7bd0ff",
-                "on-primary-container": "#00354a",
-                primary: "#7bd0ff",
-                "primary-fixed": "#c3e7ff",
-                background: "#111318",
-              },
-              borderRadius: {
-                DEFAULT: "0.25rem",
-                lg: "0.5rem",
-                xl: "0.75rem",
-                full: "9999px",
-              },
-              fontFamily: {
-                headline: ["Manrope"],
-                body: ["Inter"],
-                label: ["Inter"],
-              },
-            },
-          },
-        };
-      </script>
-      <style>
-        .material-symbols-outlined {
-          font-variation-settings:
-            "FILL" 0,
-            "wght" 400,
-            "GRAD" 0,
-            "opsz" 24;
-        }
-        .glass-panel {
-          background: rgba(51, 53, 58, 0.6);
-          backdrop-filter: blur(20px);
-        }
-      </style>
-      <link rel="stylesheet" href="/static/style.css" />
       {{ block "head" . }}{{ end }}
     </head>
     <body
