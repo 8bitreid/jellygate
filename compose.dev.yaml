@@ -5,6 +5,8 @@ services:
     env_file: [.env.dev]
     network_mode: host
     depends_on:
+      jellyfin:
+        condition: service_healthy
       db:
         condition: service_healthy
 
@@ -29,7 +31,7 @@ services:
     image: jellyfin/jellyfin
     container_name: jellygate-jellyfin-dev
     ports:
-      - "127.0.0.1:8097:8096"
+      - "8097:8096"
     volumes:
       - jellyfin_config:/config
       - jellyfin_cache:/cache

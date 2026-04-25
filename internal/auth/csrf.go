@@ -23,7 +23,7 @@ func SetCSRFCookie(w http.ResponseWriter, secure bool) (string, error) {
 		Path:     "/",
 		HttpOnly: false, // must be readable by the form template
 		Secure:   secure,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteLaxMode,
 	})
 	return token, nil
 }

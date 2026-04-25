@@ -99,6 +99,18 @@ Install dependencies:
 npm install
 ```
 
+Build Tailwind CSS (required before running the app):
+
+```bash
+npm run build:css
+```
+
+Watch mode for CSS during development:
+
+```bash
+npm run watch:css
+```
+
 Lint HTML templates:
 
 ```bash

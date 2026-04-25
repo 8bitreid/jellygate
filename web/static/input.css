@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .material-symbols-outlined {
+    font-variation-settings:
+      "FILL" 0,
+      "wght" 400,
+      "GRAD" 0,
+      "opsz" 24;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background: rgba(51, 53, 58, 0.6);
+    backdrop-filter: blur(20px);
+  }
+}
